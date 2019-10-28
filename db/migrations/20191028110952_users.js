@@ -1,11 +1,8 @@
 exports.up = function(knex) {
   console.log("creating users table...");
   return knex.schema.createTable("users", userTable => {
-    userTable
-      .string("username")
-      .unique()
-      .primary();
-    userTable.string("avatar_url");
+    userTable.string("username").primary();
+    userTable.string("avatar_url").notNullable();
     userTable.string("name").notNullable();
   });
 };
