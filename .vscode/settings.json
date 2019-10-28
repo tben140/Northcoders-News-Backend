@@ -1,0 +1,13 @@
+{
+  "sqltools.connections": [
+    {
+      "askForPassword": false,
+      "database": "nc_news_test",
+      "dialect": "PostgreSQL",
+      "name": "nc-news test",
+      "port": 5432,
+      "server": "localhost",
+      "username": "bentaylor"
+    }
+  ]
+}
