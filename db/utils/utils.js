@@ -20,6 +20,7 @@ exports.makeRefObj = list => {
 };
 
 exports.formatComments = (comments, articleRef) => {
+  console.log("Comments ->", comments);
   const output = comments.map(item => {
     for (let i = 0; i < comments.length; i++) {
       let outputObj = {};
@@ -32,6 +33,6 @@ exports.formatComments = (comments, articleRef) => {
       return outputObj;
     }
   });
-  console.log("Output (Return Value)-> ", output);
+  // console.log("Output (Return Value)-> ", output);
   return output;
 };

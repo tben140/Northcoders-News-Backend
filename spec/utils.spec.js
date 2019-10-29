@@ -287,4 +287,30 @@ describe("formatComments", () => {
       }
     ]);
   });
+
+  //Test below cannot run properly yet
+  // it("formatComments() does not mutate the original array of comments objects", () => {
+  //   const original = [
+  //     {
+  //       body:
+  //         "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+  //       belongs_to: "They're not exactly dogs, are they?",
+  //       created_by: "butter_bridge",
+  //       votes: 16,
+  //       created_at: 1511354163389
+  //     }
+  //   ];
+  //   const input = [
+  //     {
+  //       body:
+  //         "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+  //       belongs_to: "They're not exactly dogs, are they?",
+  //       created_by: "butter_bridge",
+  //       votes: 16,
+  //       created_at: 1511354163389
+  //     }
+  //   ];
+  //   formatComments(input);
+  //   expect(input).to.eql(original);
+  // });
 });
