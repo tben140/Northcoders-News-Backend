@@ -1,6 +1,4 @@
 exports.formatDates = list => {
-  // console.log("list before for loop ->", list);
-
   const output = list.map(item => {
     let outputObj = {};
     outputObj.title = item.title;
@@ -10,9 +8,30 @@ exports.formatDates = list => {
     outputObj.created_at = new Date(item.created_at);
     return outputObj;
   });
+  console.log("Format Dates output ->", output);
   return output;
 };
 
-exports.makeRefObj = list => {};
+exports.makeRefObj = list => {
+  return list.reduce((acc, obj) => {
+    acc[obj.title] = obj.article_id;
+    return acc;
+  }, {});
+};
 
-exports.formatComments = (comments, articleRef) => {};
+exports.formatComments = (comments, articleRef) => {
+  const output = comments.map(item => {
+    for (let i = 0; i < comments.length; i++) {
+      let outputObj = {};
+      outputObj.body = item.body;
+      outputObj.article_id = articleRef[item.belongs_to];
+      outputObj.author = item.created_by;
+      outputObj.votes = item.votes;
+      outputObj.created_at = new Date(item.created_at);
+      console.log("OutputObj ->", outputObj);
+      return outputObj;
+    }
+  });
+  console.log("Output (Return Value)-> ", output);
+  return output;
+};
