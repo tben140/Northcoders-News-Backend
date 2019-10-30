@@ -8,7 +8,7 @@ exports.formatDates = list => {
     outputObj.created_at = new Date(item.created_at);
     return outputObj;
   });
-  console.log("Format Dates output ->", output);
+  // console.log("Format Dates output ->", output);
   return output;
 };
 
@@ -20,7 +20,7 @@ exports.makeRefObj = list => {
 };
 
 exports.formatComments = (comments, articleRef) => {
-  console.log("Comments ->", comments);
+  // console.log("Comments ->", comments);
   const output = comments.map(item => {
     for (let i = 0; i < comments.length; i++) {
       let outputObj = {};
@@ -29,10 +29,9 @@ exports.formatComments = (comments, articleRef) => {
       outputObj.author = item.created_by;
       outputObj.votes = item.votes;
       outputObj.created_at = new Date(item.created_at);
-      console.log("OutputObj ->", outputObj);
+      // console.log("OutputObj ->", outputObj);
       return outputObj;
     }
   });
-  // console.log("Output (Return Value)-> ", output);
   return output;
 };

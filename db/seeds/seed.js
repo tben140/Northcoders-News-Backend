@@ -2,7 +2,7 @@ const { topicData, articleData, commentData, userData } = require("../data");
 
 const { formatDates, formatComments, makeRefObj } = require("../utils/utils");
 
-console.log(topicData, userData);
+// console.log(topicData, userData);
 exports.seed = function(knex) {
   return knex.migrate
     .rollback()
@@ -21,8 +21,8 @@ exports.seed = function(knex) {
       return Promise.all([topicsInsertions, usersInsertions]);
     })
     .then(([topicsInsertions, usersInsertions]) => {
-      console.log("User Insertions ->", usersInsertions);
-      console.log("Topic Insertions ->", topicsInsertions);
+      // console.log("User Insertions ->", usersInsertions);
+      // console.log("Topic Insertions ->", topicsInsertions);
       const formattedArticleData = formatDates(articleData);
       return knex("articles")
         .insert(formattedArticleData)
@@ -38,7 +38,7 @@ exports.seed = function(knex) {
     */
     })
     .then(articleRows => {
-      console.log("Article Insertions ->", articleRows);
+      // console.log("Article Insertions ->", articleRows);
       /*
 
     Your comment data is currently in the incorrect format and will violate your SQL schema.
@@ -49,9 +49,9 @@ exports.seed = function(knex) {
     */
 
       const articleRef = makeRefObj(articleRows);
-      console.log("Article Ref ->", articleRef);
+      // console.log("Article Ref ->", articleRef);
       const formattedComments = formatComments(commentData, articleRef);
-      console.log("Formatted Comments ->", formattedComments);
+      // console.log("Formatted Comments ->", formattedComments);
       return knex("comments").insert(formattedComments);
     });
 };
