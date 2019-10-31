@@ -33,6 +33,16 @@ exports.insertCommentToArticle = (article_id, username, body) => {
     .returning("*");
 };
 
-exports.selectCommentsByArticleId = article_id => {};
+exports.selectCommentsByArticleId = (article_id, sort_by, order) => {
+  return connection
+    .select("*")
+    .from("comments")
+    .where("comments.article_id", article_id)
+    .modify(query => {
+      if (sort_by) {
+        query.orderBy(sort_by, order);
+      }
+    });
+};
 
 exports.selectArticles = () => {};

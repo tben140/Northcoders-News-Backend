@@ -81,6 +81,82 @@ describe("app", () => {
         });
       });
       describe("/:article_id", () => {
+        describe("/comments", () => {
+          describe("GET", () => {
+            it("GET:200 - returns a JSON object of comments with default sorting", () => {
+              return request(app)
+                .get("/api/articles/1/comments")
+                .expect(200)
+                .then(({ body }) => {
+                  console.log("INSIDE POST TEST BODY ->", body);
+                  expect(body).to.be.an("object");
+                  expect(body.comments.length).to.equal(13);
+                  body.comments.forEach(comment => {
+                    expect(comment).to.have.keys([
+                      "comment_id",
+                      "author",
+                      "article_id",
+                      "votes",
+                      "created_at",
+                      "body"
+                    ]);
+                  });
+                });
+            });
+            it.only("GET:200 - returns a JSON object of comments sorted by votes in descending order", () => {
+              return request(app)
+                .get("/api/articles/1/comments?sort_by=votes&order=desc")
+                .expect(200)
+                .then(({ body }) => {
+                  console.log("INSIDE POST TEST BODY ->", body);
+                  expect(body).to.be.an("object");
+                  expect(body.comments.length).to.equal(13);
+                  body.comments.forEach(comment => {
+                    expect(comment).to.have.keys([
+                      "comment_id",
+                      "author",
+                      "article_id",
+                      "votes",
+                      "created_at",
+                      "body"
+                    ]);
+                  });
+                  expect(body.comments[0]).to.eql({
+                    comment_id: 3,
+                    author: "icellusedkars",
+                    article_id: 1,
+                    votes: 100,
+                    created_at: "2015-11-23T12:36:03.389Z",
+                    body:
+                      "Replacing the quiet elegance of the dark suit and tie with the casual indifference of these muted earth tones is a form of fashion suicide, but, uh, call me crazy — onyou it works."
+                  });
+                  expect(body.comments[body.comments.length - 1]).to.eql({
+                    comment_id: 4,
+                    author: "icellusedkars",
+                    article_id: 1,
+                    votes: -100,
+                    created_at: "2014-11-23T12:36:03.389Z",
+                    body:
+                      " I carry a log — yes. Is it funny to you? It is not to me."
+                  });
+                });
+            });
+          });
+          describe("POST", () => {
+            it("POST:201 - Posts a comment to the supplied article_id and returns the posted comment", () => {
+              return request(app)
+                .post("/api/articles/1/comments")
+                .send({ username: "Ben", body: "THIS IS A TEST COMMENT" })
+                .expect(201)
+                .then(({ body }) => {
+                  console.log("INSIDE POST TEST BODY ->", body);
+                  expect(body).to.be.an("object");
+                  expect(treasure).to.have.keys(["username", "body"]);
+                });
+            });
+            describe("POST ERRORS", () => {});
+          });
+        });
         describe("GET", () => {
           it("GET:200 - returns an object", () => {
             return request(app)
@@ -168,7 +244,7 @@ describe("app", () => {
               });
           });
           describe("PATCH ERRORS", () => {
-            it.only("ERROR: 400 - No inc_votes on request body", () => {
+            it("ERROR: 400 - No inc_votes on request body", () => {
               return request(app)
                 .patch("/api/articles/6")
                 .expect(400)
@@ -200,51 +276,6 @@ describe("app", () => {
                 });
             });
           });
-        });
-        describe("POST", () => {
-          it("POST:201 - Insert comment for the specified article_id", () => {
-            return request(app)
-              .post("/api/articles/6/comments")
-              .send({ username: "Ben", body: "This is a test comment" })
-              .expect(201)
-              .then(({ body }) => {
-                console.log("INSIDE POST TEST BODY ->", body);
-                expect(body).to.be.an("object");
-                expect(treasure).to.have.keys(["username", "body"]);
-              })
-              .then(response => {
-                // it("gets the newly inserted comment", () => {
-                //   return request(app)
-                //     .get("/api/")
-                //     .expect(200)
-                //     .then(({ body: { treasure } }) => {
-                //       expect(treasure).to.be.an("array");
-                //       expect(treasure.length).to.equal(27);
-                //       treasure.forEach(element => {
-                //         expect(element).to.have.keys([
-                //           "treasure_id",
-                //           "treasure_name",
-                //           "colour",
-                //           "age",
-                //           "cost_at_auction",
-                //           "shop_name"
-                //         ]);
-                //       });
-                //       expect(
-                //         treasure.includes({
-                //           treasure_id: 27,
-                //           treasure_name: "newTreasure",
-                //           colour: "red",
-                //           age: 200,
-                //           cost_at_auction: "299.10",
-                //           shop_id: 8
-                //         })
-                //       ).to.be(true);
-                //     });
-                // });
-              });
-          });
-          describe("POST ERRORS", () => {});
         });
       });
     });

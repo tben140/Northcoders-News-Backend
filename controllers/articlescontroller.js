@@ -54,9 +54,18 @@ exports.postCommentToArticle = (req, res, next) => {
       console.log("addedComment before send ->", addedComment);
       res.status(201).send({ addedComment });
     })
-    .catch(next);
+    .catch(console.log);
 };
 
-exports.getCommentsByArticleId = (req, res, next) => {};
+exports.getCommentsByArticleId = (req, res, next) => {
+  const { article_id } = req.params;
+  const { sort_by, order } = req.query;
+
+  return selectCommentsByArticleId(article_id, sort_by, order)
+    .then(comments => {
+      res.status(200).send({ comments });
+    })
+    .catch(next);
+};
 
 exports.getArticles = (req, res, next) => {};
