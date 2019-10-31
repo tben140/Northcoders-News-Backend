@@ -1,12 +1,15 @@
-const { selectArticles } = require("../models/articlesmodel.js");
+const {
+  selectArticlesByArticleId,
+  updateArticles,
+  insertCommentToArticle,
+  selectCommentsByArticleId,
+  selectArticles
+} = require("../models/articlesmodel.js");
 
-exports.getArticles = (req, res, next) => {
-  // console.log("In getArticles controller...");
+exports.getArticlesByArticleId = (req, res, next) => {
   const { article_id } = req.params;
-  // console.log("Article_id -> ", article_id);
-  return selectArticles(article_id)
+  return selectArticlesByArticleId(article_id)
     .then(article => {
-      // console.log("Article -> ", article);
       if (!article) {
         return Promise.reject({
           status: 404,
@@ -18,3 +21,40 @@ exports.getArticles = (req, res, next) => {
     })
     .catch(next);
 };
+
+//PatchArticles needs further work
+exports.patchArticles = (req, res, next) => {
+  console.log("In patchArticles controller...");
+  const { article_id } = req.params;
+  const inc_vote = req.body;
+  const incValue = inc_vote.inc_votes;
+  return updateArticles(article_id, incValue)
+    .then(article => {
+      console.log(
+        "In postArticles controller before send ...",
+        article_id,
+        incValue
+      );
+      res.status(201).send({ article });
+    })
+    .catch(next);
+};
+
+exports.postCommentToArticle = (req, res, next) => {
+  console.log("In postCommentToArticle controller...");
+  console.log("PARAMS AND BODY", req.params, req.body);
+  const article_id = req.params.article_id;
+  const commentBody = req.body.body;
+  const username = req.body.username;
+
+  return insertCommentToArticle(article_id, username, commentBody)
+    .then(addedComment => {
+      console.log("addedComment before send ->", addedComment);
+      res.status(201).send({ addedComment });
+    })
+    .catch(next);
+};
+
+exports.getCommentsByArticleId = (req, res, next) => {};
+
+exports.getArticles = (req, res, next) => {};

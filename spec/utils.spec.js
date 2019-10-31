@@ -99,7 +99,6 @@ describe("formatDates", () => {
       }
     ];
     formatDates(input);
-    // console.log("Input after format dates ->", input);
     expect(input).to.eql(original);
   });
 });
