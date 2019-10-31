@@ -6,8 +6,47 @@ const {
 } = require("../db/utils/utils");
 
 describe("formatDates", () => {
-  it("formatDates() returns a new array containing a single object, where the object in the new array has a Javascript Date object instead of a UNIX timestamp as a value for the timestamp", () => {
+  it("formatDates returns a new array containing a single object, where the object in the new array contains all the same key-value pairs apart from the created_at key has a Javascript Date object instead of a UNIX timestamp", () => {
     const list = [
+      {
+        title: "Living in the shadow of a great man",
+        topic: "mitch",
+        author: "butter_bridge",
+        body: "I find this existence challenging",
+        created_at: 1542284514171,
+        votes: 100
+      }
+    ];
+
+    expect(formatDates(list)).to.eql([
+      {
+        title: "Living in the shadow of a great man",
+        topic: "mitch",
+        author: "butter_bridge",
+        body: "I find this existence challenging",
+        created_at: new Date(1542284514171),
+        votes: 100
+      }
+    ]);
+  });
+  it("formatDates returns a new array containing multiple objects, where the objects in the new array contain all the same key-value pairs apart from the created_at key in each object has a Javascript Date object instead of a UNIX timestamp", () => {
+    const list = [
+      {
+        title: "Living in the shadow of a great man",
+        topic: "mitch",
+        author: "butter_bridge",
+        body: "I find this existence challenging",
+        created_at: 1542284514171,
+        votes: 100
+      },
+      {
+        title: "Sony Vaio; or, The Laptop",
+        topic: "mitch",
+        author: "icellusedkars",
+        body:
+          "Call me Mitchell. Some years ago—never mind how long precisely—having little or no money in my purse, and nothing particular to interest me on shore, I thought I would buy a laptop about a little and see the codey part of the world. It is a way I have of driving off the spleen and regulating the circulation. Whenever I find myself growing grim about the mouth; whenever it is a damp, drizzly November in my soul; whenever I find myself involuntarily pausing before coffin warehouses, and bringing up the rear of every funeral I meet; and especially whenever my hypos get such an upper hand of me, that it requires a strong moral principle to prevent me from deliberately stepping into the street, and methodically knocking people’s hats off—then, I account it high time to get to coding as soon as I can. This is my substitute for pistol and ball. With a philosophical flourish Cato throws himself upon his sword; I quietly take to the laptop. There is nothing surprising in this. If they but knew it, almost all men in their degree, some time or other, cherish very nearly the same feelings towards the the Vaio with me.",
+        created_at: 1416140514171
+      },
       {
         title: "Eight pug gifs that remind me of mitch",
         topic: "mitch",
@@ -19,17 +58,34 @@ describe("formatDates", () => {
 
     expect(formatDates(list)).to.eql([
       {
+        title: "Living in the shadow of a great man",
+        topic: "mitch",
+        author: "butter_bridge",
+        body: "I find this existence challenging",
+        created_at: new Date(1542284514171),
+        votes: 100
+      },
+      {
+        title: "Sony Vaio; or, The Laptop",
+        topic: "mitch",
+        author: "icellusedkars",
+        body:
+          "Call me Mitchell. Some years ago—never mind how long precisely—having little or no money in my purse, and nothing particular to interest me on shore, I thought I would buy a laptop about a little and see the codey part of the world. It is a way I have of driving off the spleen and regulating the circulation. Whenever I find myself growing grim about the mouth; whenever it is a damp, drizzly November in my soul; whenever I find myself involuntarily pausing before coffin warehouses, and bringing up the rear of every funeral I meet; and especially whenever my hypos get such an upper hand of me, that it requires a strong moral principle to prevent me from deliberately stepping into the street, and methodically knocking people’s hats off—then, I account it high time to get to coding as soon as I can. This is my substitute for pistol and ball. With a philosophical flourish Cato throws himself upon his sword; I quietly take to the laptop. There is nothing surprising in this. If they but knew it, almost all men in their degree, some time or other, cherish very nearly the same feelings towards the the Vaio with me.",
+        created_at: new Date(1416140514171),
+        votes: undefined
+      },
+      {
         title: "Eight pug gifs that remind me of mitch",
         topic: "mitch",
         author: "icellusedkars",
         body: "some gifs",
-        created_at: new Date(1289996514171)
+        created_at: new Date(1289996514171),
+        votes: undefined
       }
     ]);
   });
-
-  it("formatDates() returns a new array containing multiple objects, where the objects in the new array have a Javascript Date object instead of a UNIX timestamp as a value for the timestamp", () => {
-    const list = [
+  it("formatDates does not mutate the original array of objects", () => {
+    const original = [
       {
         title: "Eight pug gifs that remind me of mitch",
         topic: "mitch",
@@ -53,42 +109,6 @@ describe("formatDates", () => {
         created_at: 1037708514171
       }
     ];
-
-    expect(formatDates(list)).to.eql([
-      {
-        title: "Eight pug gifs that remind me of mitch",
-        topic: "mitch",
-        author: "icellusedkars",
-        body: "some gifs",
-        created_at: new Date(1289996514171)
-      },
-      {
-        title: "Student SUES Mitch!",
-        topic: "mitch",
-        author: "rogersop",
-        body:
-          "We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages",
-        created_at: new Date(1163852514171)
-      },
-      {
-        title: "UNCOVERED: catspiracy to bring down democracy",
-        topic: "cats",
-        author: "rogersop",
-        body: "Bastet walks amongst us, and the cats are taking arms!",
-        created_at: new Date(1037708514171)
-      }
-    ]);
-  });
-  it("formatDates() does not mutate the original array of objects", () => {
-    const original = [
-      {
-        title: "Eight pug gifs that remind me of mitch",
-        topic: "mitch",
-        author: "icellusedkars",
-        body: "some gifs",
-        created_at: 1289996514171
-      }
-    ];
     const input = [
       {
         title: "Eight pug gifs that remind me of mitch",
@@ -96,6 +116,21 @@ describe("formatDates", () => {
         author: "icellusedkars",
         body: "some gifs",
         created_at: 1289996514171
+      },
+      {
+        title: "Student SUES Mitch!",
+        topic: "mitch",
+        author: "rogersop",
+        body:
+          "We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages",
+        created_at: 1163852514171
+      },
+      {
+        title: "UNCOVERED: catspiracy to bring down democracy",
+        topic: "cats",
+        author: "rogersop",
+        body: "Bastet walks amongst us, and the cats are taking arms!",
+        created_at: 1037708514171
       }
     ];
     formatDates(input);
@@ -104,7 +139,7 @@ describe("formatDates", () => {
 });
 
 describe("makeRefObj", () => {
-  it("makeRefObj() returns an object with a single key-value pair when passed an array containing a single object", () => {
+  it("makeRefObj returns a reference object with a single key-value pair when passed an array containing a single object", () => {
     const input = [
       {
         article_id: 1,
@@ -120,7 +155,7 @@ describe("makeRefObj", () => {
       "Living in the shadow of a great man": 1
     });
   });
-  it("makeRefObj() returns an object with a multiple key-value pairs when passed an array containing a multiple objects", () => {
+  it("makeRefObj returns an object with a multiple key-value pairs when passed an array containing a multiple objects", () => {
     const input = [
       {
         article_id: 1,
@@ -182,7 +217,7 @@ describe("makeRefObj", () => {
 });
 
 describe("formatComments", () => {
-  it("formatComments() returns an array containing a single object where the properties include author, article_id and created_at", () => {
+  it("formatComments returns an array containing a single object where the properties include author, article_id and created_at", () => {
     const input = [
       {
         body:
@@ -218,7 +253,7 @@ describe("formatComments", () => {
       }
     ]);
   });
-  it("formatComments() returns an array containing a multiple objects where the properties include author, article_id and created_at", () => {
+  it("formatComments returns an array containing a multiple objects where the properties include author, article_id and created_at", () => {
     const input = [
       {
         body:
@@ -287,29 +322,42 @@ describe("formatComments", () => {
     ]);
   });
 
-  //Test below cannot run properly yet
-  // it("formatComments() does not mutate the original array of comments objects", () => {
-  //   const original = [
-  //     {
-  //       body:
-  //         "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
-  //       belongs_to: "They're not exactly dogs, are they?",
-  //       created_by: "butter_bridge",
-  //       votes: 16,
-  //       created_at: 1511354163389
-  //     }
-  //   ];
-  //   const input = [
-  //     {
-  //       body:
-  //         "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
-  //       belongs_to: "They're not exactly dogs, are they?",
-  //       created_by: "butter_bridge",
-  //       votes: 16,
-  //       created_at: 1511354163389
-  //     }
-  //   ];
-  //   formatComments(input);
-  //   expect(input).to.eql(original);
-  // });
+  it("formatComments does not mutate the original array of comments objects", () => {
+    const original = [
+      {
+        body:
+          "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+        belongs_to: "They're not exactly dogs, are they?",
+        created_by: "butter_bridge",
+        votes: 16,
+        created_at: 1511354163389
+      }
+    ];
+    const input = [
+      {
+        body:
+          "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+        belongs_to: "They're not exactly dogs, are they?",
+        created_by: "butter_bridge",
+        votes: 16,
+        created_at: 1511354163389
+      }
+    ];
+    const articleRef = {
+      "Living in the shadow of a great man": 1,
+      "Sony Vaio; or, The Laptop": 2,
+      "Eight pug gifs that remind me of mitch": 3,
+      "Student SUES Mitch!": 4,
+      "UNCOVERED: catspiracy to bring down democracy": 5,
+      A: 6,
+      Z: 7,
+      "Does Mitch predate civilisation?": 8,
+      "They're not exactly dogs, are they?": 9,
+      "Seven inspirational thought leaders from Manchester UK": 10,
+      "Am I a cat?": 11,
+      Moustache: 12
+    };
+    formatComments(input, articleRef);
+    expect(input).to.eql(original);
+  });
 });

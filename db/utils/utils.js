@@ -5,6 +5,7 @@ exports.formatDates = list => {
     outputObj.topic = item.topic;
     outputObj.author = item.author;
     outputObj.body = item.body;
+    outputObj.votes = item.votes;
     outputObj.created_at = new Date(item.created_at);
     return outputObj;
   });

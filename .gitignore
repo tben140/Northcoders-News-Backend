@@ -2,3 +2,4 @@ node_modules
 knexfile.js
 .vscode/
 query.sql
+notesfromqanda.txt

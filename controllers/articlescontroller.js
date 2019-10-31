@@ -22,20 +22,22 @@ exports.getArticlesByArticleId = (req, res, next) => {
     .catch(next);
 };
 
-//PatchArticles needs further work
 exports.patchArticles = (req, res, next) => {
-  console.log("In patchArticles controller...");
   const { article_id } = req.params;
-  const inc_vote = req.body;
-  const incValue = inc_vote.inc_votes;
-  return updateArticles(article_id, incValue)
+  const { inc_votes } = req.body;
+  // console.log(req.body, article_id, inc_votes);
+
+  if (Object.keys(req.body).length === 0) {
+    return res.status(400).send({ msg: "No inc_votes on request body" });
+  }
+  if (Object.keys(req.body).length > 1) {
+    return res.status(400).send({ msg: "Other property on the request body" });
+  }
+
+  return updateArticles(article_id, inc_votes)
     .then(article => {
-      console.log(
-        "In postArticles controller before send ...",
-        article_id,
-        incValue
-      );
-      res.status(201).send({ article });
+      const [articleObj] = article;
+      res.status(201).send({ articleObj });
     })
     .catch(next);
 };

@@ -5,8 +5,8 @@ exports.up = function(knex) {
     articleTable.text("body").notNullable();
     articleTable
       .integer("votes")
-      .notNullable()
-      .defaultTo(0);
+      .defaultTo(0)
+      .notNullable();
     articleTable
       .string("topic")
       .references("topics.slug")

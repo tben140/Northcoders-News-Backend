@@ -129,18 +129,77 @@ describe("app", () => {
           });
         });
         describe("PATCH", () => {
-          it("PATCH 201 - Update vote value for the specified article_id", () => {
+          it("PATCH:201 - Increase vote value by 1 for the specified article_id and return the updated article as an object", () => {
             return request(app)
               .patch("/api/articles/6")
               .send({ inc_votes: 1 })
               .expect(201)
-              .then(({ body: { article } }) => {
-                // console.log("TEST PATCH body", body);
-                // console.log("TEST PATCH Obj", articles);
-                // console.log("TEST PATCH inc_votes", inc_votes);
+              .then(({ body: { articleObj } }) => {
+                expect(articleObj).to.be.an("object");
+                expect(articleObj).to.have.keys([
+                  "article_id",
+                  "title",
+                  "body",
+                  "votes",
+                  "topic",
+                  "author",
+                  "created_at"
+                ]);
+                expect(articleObj.votes).to.equal(1);
               });
           });
-          describe("PATCH ERRORS", () => {});
+          it("PATCH:201 - Decrease vote value by 10 for the specified article_id and return the updated article as an object", () => {
+            return request(app)
+              .patch("/api/articles/6")
+              .send({ inc_votes: -10 })
+              .expect(201)
+              .then(({ body: { articleObj } }) => {
+                expect(articleObj).to.be.an("object");
+                expect(articleObj).to.have.keys([
+                  "article_id",
+                  "title",
+                  "body",
+                  "votes",
+                  "topic",
+                  "author",
+                  "created_at"
+                ]);
+                expect(articleObj.votes).to.equal(-10);
+              });
+          });
+          describe("PATCH ERRORS", () => {
+            it.only("ERROR: 400 - No inc_votes on request body", () => {
+              return request(app)
+                .patch("/api/articles/6")
+                .expect(400)
+                .then(({ body }) => {
+                  expect(body.msg).to.equal("No inc_votes on request body");
+                });
+            });
+            it("ERROR: 400 - Invalid inc_votes value", () => {
+              return request(app)
+                .patch("/api/articles/6")
+                .send({ inc_votes: "abc" })
+                .expect(400)
+                .then(({ body }) => {
+                  const errMsg = body.msg.split("-")[1];
+                  expect(errMsg).to.equal(
+                    ' invalid input syntax for type integer: "NaN"'
+                  );
+                });
+            });
+            it("ERROR: 400 - Other property on the request body", () => {
+              return request(app)
+                .patch("/api/articles/6")
+                .send({ inc_votes: "1", name: "mitch" })
+                .expect(400)
+                .then(({ body }) => {
+                  expect(body.msg).to.equal(
+                    "Other property on the request body"
+                  );
+                });
+            });
+          });
         });
         describe("POST", () => {
           it("POST:201 - Insert comment for the specified article_id", () => {

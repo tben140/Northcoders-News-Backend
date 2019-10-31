@@ -14,10 +14,9 @@ exports.selectArticlesByArticleId = article_id => {
 };
 
 exports.updateArticles = (article_id, inc_votes) => {
-  const incValue = inc_votes.inc_votes;
   return connection("articles")
     .where("article_id", "=", article_id)
-    .increment("votes", incValue)
+    .increment("votes", inc_votes)
     .returning("*");
 };
 
