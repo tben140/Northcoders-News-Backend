@@ -1,19 +1,20 @@
 exports.handleCustomErrors = (err, req, res, next) => {
-  console.log("Custom errors->", err);
+  // console.log("Custom errors->", err);
   if (err.status === 400) {
-    console.log("err.msg before send ->", err.msg);
+    // console.log("err.msg before send ->", err.msg);
     res.status(400).send({ msg: err.msg || "Bad Request" });
   } else if (err.status === 404) {
-    console.log("err.msg before send ->", err.msg);
+    // console.log("err.msg before send ->", err.msg);
     res.status(404).send({ msg: err.msg || "Not Found" });
   } else next(err);
 };
 
 exports.psqlErrorHandler = (err, req, res, next) => {
-  console.log("PSQL Error ->", err);
-  const psqlCodes = ["22P02"];
+  // console.log("PSQL Error ->", err);
+  const psqlCodes = ["22P02", "42703", "23503"];
   if (psqlCodes.includes(err.code)) {
-    res.status(400).send({ msg: err.message || "Bad Request" });
+    const splitMsg = err.message.split("-")[1];
+    res.status(400).send({ msg: splitMsg || "Bad Request" });
   } else next(err);
 };
 

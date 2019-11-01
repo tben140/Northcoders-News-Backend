@@ -21,19 +21,23 @@ exports.updateArticles = (article_id, inc_votes) => {
 };
 
 exports.insertCommentToArticle = (article_id, username, body) => {
-  console.log(
-    "In insertCommentToArticle model ...",
-    article_id,
-    username,
-    body
-  );
+  // console.log(
+  //   "In insertCommentToArticle model ...",
+  //   article_id,
+  //   username,
+  //   body
+  // );
 
   return connection("comments")
-    .insert([{ author: username }, { article_id: article_id }, { body: body }])
+    .insert([{ author: username, article_id: article_id, body: body }])
     .returning("*");
 };
 
-exports.selectCommentsByArticleId = (article_id, sort_by, order) => {
+exports.selectCommentsByArticleId = (
+  article_id,
+  sort_by = "created_at",
+  order = "desc"
+) => {
   return connection
     .select("*")
     .from("comments")
@@ -45,8 +49,12 @@ exports.selectCommentsByArticleId = (article_id, sort_by, order) => {
     });
 };
 
-exports.selectArticles = (sort_by, order, author, topic) => {
-  console.log("Inside selectArticles ...");
+exports.selectArticles = (
+  sort_by = "created_at",
+  order = "desc",
+  author,
+  topic
+) => {
   return connection
     .select("articles.*")
     .count("comment_id", { as: "comment_count" })

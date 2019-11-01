@@ -25,7 +25,7 @@ describe("app", () => {
   });
   describe("/api", () => {
     describe("GET", () => {
-      it("GET:200 - returns an object containing all of the available endpoints", () => {});
+      xit("GET:200 - returns an object containing all of the available endpoints", () => {});
     });
     describe("/topics", () => {
       describe("GET", () => {
@@ -34,8 +34,6 @@ describe("app", () => {
             .get("/api/topics")
             .expect(200)
             .then(({ body: topics }) => {
-              console.log("topics -> ", topics);
-
               expect(topics).to.be.an("object");
               expect(topics).to.have.keys("topics");
               expect(topics.topics.length).to.equal(3);
@@ -44,18 +42,17 @@ describe("app", () => {
               });
             });
         });
-        describe("GET ERRORS", () => {});
+        xdescribe("GET ERRORS", () => {});
       });
     });
     describe("/users", () => {
       describe("/:username", () => {
         describe("GET", () => {
-          it("GET:200 - returns an object containing username,avatar_url and name where a username that is present in the users table has been passed", () => {
+          it("GET:200 - returns an object containing username,avatar_url and name when a username that is present in the users table has been passed", () => {
             return request(app)
               .get("/api/users/butter_bridge")
               .expect(200)
               .then(({ body: users }) => {
-                console.log("TEST inside then", users);
                 expect(users).to.be.an("object");
                 expect(users).to.have.keys(["username", "avatar_url", "name"]);
               });
@@ -66,9 +63,8 @@ describe("app", () => {
                 .get("/api/users/userthatdoesnotexist")
                 .expect(404)
                 .then(({ body }) => {
-                  console.log("Then block body ->", body);
-                  //Line below not working
-                  // expect(body.status).to.equal(404);
+                  expect(body).to.be.an("object");
+                  expect(body).to.have.keys(["msg"]);
                   expect(body.msg).to.equal("username not found");
                 });
             });
@@ -79,12 +75,12 @@ describe("app", () => {
     describe("/articles", () => {
       describe("/", () => {
         describe("GET", () => {
-          it("GET:200 - returns an array of article objects when no parameters are passed", () => {
+          it("GET:200 - returns an array of article objects with default sorting (created_at, desc) when no parameters are passed", () => {
             return request(app)
               .get("/api/articles")
               .expect(200)
               .then(({ body }) => {
-                console.log("INSIDE POST TEST BODY ->", body);
+                // console.log("INSIDE POST TEST BODY ->", body);
                 expect(body).to.be.an("object");
                 expect(body.articles.length).to.equal(12);
                 body.articles.forEach(article => {
@@ -98,6 +94,9 @@ describe("app", () => {
                     "created_at",
                     "comment_count"
                   ]);
+                  expect(body.articles).to.be.sortedBy("created_at", {
+                    descending: true
+                  });
                 });
               });
           });
@@ -108,7 +107,7 @@ describe("app", () => {
               )
               .expect(200)
               .then(({ body }) => {
-                console.log("INSIDE POST TEST BODY ->", body);
+                // console.log("INSIDE POST TEST BODY ->", body);
                 expect(body).to.be.an("object");
                 expect(body.articles.length).to.equal(3);
                 body.articles.forEach(article => {
@@ -123,15 +122,79 @@ describe("app", () => {
                     "comment_count"
                   ]);
                 });
+                // body.articles.forEach(article => {
+                //   expect(article.comment_count).to.equal()
+                // })
               });
           });
           describe("GET ERRORS", () => {
-            it("ERROR: 400 - sort_by value is not a valid column", () => {});
-            it("ERROR: 400 - order value is not 'asc' or 'desc'", () => {});
-            it("ERROR: 400 - author value is not in the articles table", () => {});
-            it("ERROR: 400 - topic value is not in the articles table", () => {});
-            it("ERROR: 200 - author exists but no articles are linked to this author", () => {});
-            it("ERROR: 200 - topic exists but no articles are linked to this topic", () => {});
+            it("ERROR: 400 - sort_by value is not a valid column", () => {
+              return request(app)
+                .get("/api/articles?sort_by=notValidColumn")
+                .expect(400)
+                .then(({ body }) => {
+                  expect(body).to.be.an("object");
+                  expect(body).to.have.keys(["msg"]);
+                  expect(body.msg).to.equal(
+                    ' column "notValidColumn" does not exist'
+                  );
+                });
+            });
+            xit("ERROR: 400 - order value is not 'asc' or 'desc'", () => {
+              return request(app)
+                .get("/api/articles?sort_by=created_at&order=notAnOrder")
+                .expect(400)
+                .then(({ body }) => {
+                  // console.log("INSIDE GET TEST BODY ->", body);
+                  expect(body).to.be.an("object");
+                  expect(body).to.have.keys(["msg"]);
+                  expect(body.msg).to.equal("Invalid sort_by value");
+                });
+            });
+            xit("ERROR: 404 - author value is not in the articles table", () => {
+              return request(app)
+                .get("/api/articles?author=notAnAuthor")
+                .expect(404)
+                .then(({ body }) => {
+                  // console.log("INSIDE GET TEST BODY ->", body);
+                  expect(body).to.be.an("object");
+                  expect(body).to.have.keys(["msg"]);
+                  expect(body.msg).to.equal("No articles found for author");
+                });
+            });
+            xit("ERROR: 400 - topic value is not in the articles table", () => {
+              return request(app)
+                .get("/api/articles?topic=notATopic")
+                .expect(404)
+                .then(({ body }) => {
+                  // console.log("INSIDE GET TEST BODY ->", body);
+                  expect(body).to.be.an("object");
+                  expect(body).to.have.keys(["msg"]);
+                  expect(body.msg).to.equal("Topic not found");
+                });
+            });
+            it("ERROR: 200 - author exists but no articles are linked to this author", () => {
+              return request(app)
+                .get("/api/articles?author=lurker")
+                .expect(200)
+                .then(({ body }) => {
+                  // console.log("INSIDE GET TEST BODY ->", body);
+                  expect(body).to.be.an("object");
+                  expect(body).to.have.keys(["articles"]);
+                  expect(body.articles).to.eql([]);
+                });
+            });
+            it("ERROR: 200 - topic exists but no articles are linked to this topic", () => {
+              return request(app)
+                .get("/api/articles?topic=paper")
+                .expect(200)
+                .then(({ body }) => {
+                  // console.log("INSIDE GET TEST BODY ->", body);
+                  expect(body).to.be.an("object");
+                  expect(body).to.have.keys(["articles"]);
+                  expect(body.articles).to.eql([]);
+                });
+            });
           });
         });
       });
@@ -143,7 +206,7 @@ describe("app", () => {
                 .get("/api/articles/1/comments")
                 .expect(200)
                 .then(({ body }) => {
-                  console.log("INSIDE POST TEST BODY ->", body);
+                  // console.log("INSIDE POST TEST BODY ->", body);
                   expect(body).to.be.an("object");
                   expect(body.comments.length).to.equal(13);
                   body.comments.forEach(comment => {
@@ -155,6 +218,9 @@ describe("app", () => {
                       "created_at",
                       "body"
                     ]);
+                  });
+                  expect(body.comments).to.be.sortedBy("created_at", {
+                    descending: true
                   });
                 });
             });
@@ -163,7 +229,7 @@ describe("app", () => {
                 .get("/api/articles/1/comments?sort_by=votes&order=desc")
                 .expect(200)
                 .then(({ body }) => {
-                  console.log("INSIDE POST TEST BODY ->", body);
+                  // console.log("INSIDE POST TEST BODY ->", body);
                   expect(body).to.be.an("object");
                   expect(body.comments.length).to.equal(13);
                   body.comments.forEach(comment => {
@@ -176,58 +242,110 @@ describe("app", () => {
                       "body"
                     ]);
                   });
-                  expect(body.comments[0]).to.eql({
-                    comment_id: 3,
-                    author: "icellusedkars",
-                    article_id: 1,
-                    votes: 100,
-                    created_at: "2015-11-23T12:36:03.389Z",
-                    body:
-                      "Replacing the quiet elegance of the dark suit and tie with the casual indifference of these muted earth tones is a form of fashion suicide, but, uh, call me crazy — onyou it works."
-                  });
-                  expect(body.comments[body.comments.length - 1]).to.eql({
-                    comment_id: 4,
-                    author: "icellusedkars",
-                    article_id: 1,
-                    votes: -100,
-                    created_at: "2014-11-23T12:36:03.389Z",
-                    body:
-                      " I carry a log — yes. Is it funny to you? It is not to me."
+                  expect(body.comments).to.be.sortedBy("votes", {
+                    descending: true
                   });
                 });
             });
             describe("GET ERRORS", () => {
-              //Complete the following tests, the code for these tests will also be useful in the POST errors
-              it("ERROR: 400 - Bad article_id", () => {});
-              it("ERROR: 404 - article_id not found", () => {});
+              it("ERROR: 400 - Bad article_id", () => {
+                return request(app)
+                  .get("/api/articles/abc/comments")
+                  .expect(400)
+                  .then(({ body }) => {
+                    // console.log("INSIDE POST TEST BODY ->", body);
+                    expect(body).to.be.an("object");
+                    expect(body).to.have.keys(["msg"]);
+                    expect(body.msg).to.equal(
+                      ' invalid input syntax for type integer: "abc"'
+                    );
+                  });
+              });
+              it("ERROR: 404 - article_id not found", () => {
+                return request(app)
+                  .get("/api/articles/9999/comments")
+                  .expect(404)
+                  .then(({ body }) => {
+                    // console.log("INSIDE POST TEST BODY ->", body);
+                    expect(body).to.be.an("object");
+                    expect(body).to.have.keys(["msg"]);
+                    expect(body.msg).to.equal("article_id not found");
+                  });
+              });
             });
           });
           describe("POST", () => {
             it("POST:201 - Posts a comment to the supplied article_id and returns the posted comment", () => {
               return request(app)
                 .post("/api/articles/1/comments")
-                .send({ username: "Ben", body: "THIS IS A TEST COMMENT" })
+                .send({ username: "rogersop", body: "THIS IS A TEST COMMENT" })
                 .expect(201)
                 .then(({ body }) => {
-                  console.log("INSIDE POST TEST BODY ->", body);
+                  // console.log("INSIDE POST TEST BODY ->", body);
                   expect(body).to.be.an("object");
-                  expect(treasure).to.have.keys(["username", "body"]);
+                  expect(body.comments[0]).to.have.keys([
+                    "comment_id",
+                    "author",
+                    "article_id",
+                    "votes",
+                    "created_at",
+                    "body"
+                  ]);
                 });
             });
             describe("POST ERRORS", () => {
-              //More work required on these POST errors
               it("ERROR: 400 - Bad article_id", () => {
                 return request(app)
                   .post("/api/articles/abc/comments")
-                  .send({ username: "Ben", body: "test comment" })
+                  .send({ username: "butter_bridge", body: "Test comment" })
                   .expect(400)
-                  .then(output => {
-                    console.log("INSIDE POST response", output);
+                  .then(({ body }) => {
+                    // console.log("INSIDE POST TEST BODY ->", body);
+                    expect(body).to.be.an("object");
+                    expect(body).to.have.keys(["msg"]);
+                    expect(body.msg).to.equal(
+                      ' invalid input syntax for type integer: "abc"'
+                    );
                   });
               });
-              it("ERROR: 404 - article_id not found", () => {});
-              it("ERROR: 404 - username not found", () => {});
-              it("ERROR: 400 - No comment inside body", () => {});
+              xit("ERROR: 404 - article_id not found", () => {
+                return request(app)
+                  .post("/api/articles/9999/comments")
+                  .send({ username: "butter_bridge", body: "Test comment" })
+                  .expect(404)
+                  .then(({ body }) => {
+                    // console.log("INSIDE POST TEST BODY ->", body);
+                    expect(body).to.be.an("object");
+                    expect(body).to.have.keys(["msg"]);
+                    expect(body.msg).to.equal("article_id not found");
+                  });
+              });
+              xit("ERROR: 404 - username not found", () => {
+                return request(app)
+                  .post("/api/articles/1/comments")
+                  .send({ username: "Ben", body: "Test comment" })
+                  .expect(404)
+                  .then(({ body }) => {
+                    // console.log("INSIDE POST TEST BODY ->", body);
+                    expect(body).to.be.an("object");
+                    expect(body).to.have.keys(["msg"]);
+                    expect(body.msg).to.equal("username not found");
+                  });
+              });
+              xit("ERROR: 400 - No comment inside body", () => {
+                return request(app)
+                  .post("/api/articles/1/comments")
+                  .send({ username: "Ben" })
+                  .expect(404)
+                  .then(({ body }) => {
+                    // console.log("INSIDE POST TEST BODY ->", body);
+                    expect(body).to.be.an("object");
+                    expect(body).to.have.keys(["msg"]);
+                    expect(body.msg).to.equal(
+                      "No comment body inside the send body"
+                    );
+                  });
+              });
             });
           });
         });
@@ -271,7 +389,8 @@ describe("app", () => {
                 .get("/api/articles/abc")
                 .expect(400)
                 .then(({ body }) => {
-                  expect(body.msg.split("-")[1]).to.equal(
+                  // console.log("TEST body ->", body);
+                  expect(body.msg).to.equal(
                     ' invalid input syntax for type integer: "abc"'
                   );
                 });
@@ -324,6 +443,7 @@ describe("app", () => {
                 .send({})
                 .expect(400)
                 .then(({ body }) => {
+                  // console.log("TEST body ->", body);
                   expect(body.msg).to.equal("No inc_votes on request body");
                 });
             });
@@ -333,8 +453,7 @@ describe("app", () => {
                 .send({ inc_votes: "abc" })
                 .expect(400)
                 .then(({ body }) => {
-                  const errMsg = body.msg.split("-")[1];
-                  expect(errMsg).to.equal(
+                  expect(body.msg).to.equal(
                     ' invalid input syntax for type integer: "NaN"'
                   );
                 });
@@ -359,21 +478,87 @@ describe("app", () => {
         describe("PATCH", () => {
           it("PATCH:201 - Returns comment object with a correctly updated votes value", () => {
             return request(app)
-              .patch("/api/comments/2")
+              .patch("/api/comments/6")
               .send({ inc_votes: 1 })
               .expect(201)
               .then(({ body }) => {
-                console.log(body);
+                // console.log("INSIDE POST TEST BODY ->", body);
+                expect(body).to.be.an("object");
+                expect(body.comment[0]).to.have.keys([
+                  "comment_id",
+                  "author",
+                  "article_id",
+                  "votes",
+                  "created_at",
+                  "body"
+                ]);
+                expect(body.comment[0].votes).to.equal(1);
               });
           });
           it("PATCH:201 - Returns comment object with a correctly decremented votes value", () => {
-            //CONTINUE FROM HERE
+            return request(app)
+              .patch("/api/comments/6")
+              .send({ inc_votes: -10 })
+              .expect(201)
+              .then(({ body }) => {
+                // console.log("INSIDE POST TEST BODY ->", body);
+                expect(body).to.be.an("object");
+                expect(body.comment[0]).to.have.keys([
+                  "comment_id",
+                  "author",
+                  "article_id",
+                  "votes",
+                  "created_at",
+                  "body"
+                ]);
+                expect(body.comment[0].votes).to.equal(-10);
+              });
           });
           describe("PATCH ERRORS", () => {
-            it("ERROR 404 - comment_id not found", () => {});
-            it("ERROR 400 - Bad comment_id", () => {});
-            it("ERROR 400 - inc_votes is an invalid value", () => {});
-            it("ERROR 400 - inc_votes is not in the body", () => {});
+            it("ERROR 404 - comment_id not found", () => {
+              return request(app)
+                .patch("/api/comments/99")
+                .send({ inc_votes: 1 })
+                .expect(404)
+                .then(({ body }) => {
+                  // console.log("TEST body ->", body);
+                  expect(body.msg).to.equal("comment_id not found");
+                });
+            });
+            it("ERROR 400 - Bad comment_id", () => {
+              return request(app)
+                .patch("/api/comments/abc")
+                .send({ inc_votes: 1 })
+                .expect(400)
+                .then(({ body }) => {
+                  // console.log("TEST body ->", body);
+                  expect(body.msg).to.equal(
+                    ' invalid input syntax for type integer: "abc"'
+                  );
+                });
+            });
+            it("ERROR 400 - inc_votes is an invalid value", () => {
+              return request(app)
+                .patch("/api/comments/1")
+                .send({ inc_votes: "abc" })
+                .expect(400)
+                .then(({ body }) => {
+                  // console.log("TEST body ->", body);
+                  expect(body.msg).to.equal(
+                    ' invalid input syntax for type integer: "NaN"'
+                  );
+                });
+            });
+            it("ERROR 400 - inc_votes is not in the body", () => {
+              return request(app)
+                .patch("/api/comments/1")
+                .send({ not_votes: "abc" })
+                .expect(400)
+                .then(({ body }) => {
+                  // console.log("TEST body ->", body);
+                  expect(body.msg).to.equal("inc_votes not in body");
+                });
+            });
           });
         });
         describe("DELETE", () => {
@@ -382,12 +567,31 @@ describe("app", () => {
               .delete("/api/comments/2")
               .expect(204)
               .then(comment => {
-                console.log("Inside then block, comment ->", comment.body);
+                // console.log("Inside then block, comment ->", comment.body);
+                expect(comment.body).to.eql({});
               });
           });
           describe("DELETE ERRORS", () => {
-            it("ERROR 404 - comment_id not found", () => {});
-            it("ERROR 400 - Bad comment_id", () => {});
+            it("ERROR 404 - comment_id not found", () => {
+              return request(app)
+                .delete("/api/comments/99")
+                .expect(404)
+                .then(comment => {
+                  // console.log("Inside then block, comment ->", comment.body);
+                  expect(comment.body).to.eql({ msg: "comment_id not found" });
+                });
+            });
+            it("ERROR 400 - Bad comment_id", () => {
+              return request(app)
+                .delete("/api/comments/abc")
+                .expect(400)
+                .then(comment => {
+                  // console.log("Inside then block, comment ->", comment.body);
+                  expect(comment.body).to.eql({
+                    msg: ' invalid input syntax for type integer: "abc"'
+                  });
+                });
+            });
           });
         });
       });

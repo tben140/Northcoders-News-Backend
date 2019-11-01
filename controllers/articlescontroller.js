@@ -28,37 +28,30 @@ exports.patchArticles = (req, res, next) => {
   // console.log(req.body, article_id, inc_votes);
 
   if (Object.keys(req.body).length === 0) {
-    return Promise.reject({
-      status: 400,
-      msg: "No inc_votes on request body"
-    });
+    res.status(400).send({ msg: "No inc_votes on request body" });
   } else if (Object.keys(req.body).length > 1) {
-    return Promise.reject({
-      status: 400,
-      msg: "Other property on the request body"
-    });
+    res.status(400).send({ msg: "Other property on the request body" });
   } else {
+    return updateArticles(article_id, inc_votes)
+      .then(article => {
+        const [articleObj] = article;
+        res.status(201).send({ articleObj });
+      })
+      .catch(next);
   }
-
-  return updateArticles(article_id, inc_votes)
-    .then(article => {
-      const [articleObj] = article;
-      res.status(201).send({ articleObj });
-    })
-    .catch(next);
 };
 
 exports.postCommentToArticle = (req, res, next) => {
-  console.log("In postCommentToArticle controller...");
+  // console.log("In postCommentToArticle controller...");
 
   const { article_id } = req.params;
   const { username, body } = req.body;
-  console.log("article_id, username, body", article_id, username, body);
+  // console.log("article_id, username, body", article_id, username, body);
 
   return insertCommentToArticle(article_id, username, body)
-    .then(addedComment => {
-      console.log("addedComment before send ->", addedComment);
-      res.status(201).send({ addedComment });
+    .then(comments => {
+      // console.log("comments before send ->", comments);
+      res.status(201).send({ comments });
     })
     .catch(next);
 };
@@ -66,23 +59,59 @@ exports.postCommentToArticle = (req, res, next) => {
 exports.getCommentsByArticleId = (req, res, next) => {
   const { article_id } = req.params;
   const { sort_by, order } = req.query;
+  // console.log("Inside getCommentsByArticleId ->");
 
   return selectCommentsByArticleId(article_id, sort_by, order)
     .then(comments => {
-      res.status(200).send({ comments });
+      if (comments.length === 0) {
+        res.status(404).send({ msg: "article_id not found" });
+      } else {
+        res.status(200).send({ comments });
+      }
     })
     .catch(next);
 };
 
+// exports.getArticles = (req, res, next) => {
+//   // console.log("Inside getArticles controller...");
+//   const { sort_by, order, author, topic } = req.query;
+
+//   return selectArticles(sort_by, order, author, topic)
+//     .then(articles => {
+
+//       if (author === undefined && topic === undefined) {
+
+//       }
+
+//       if (author !== undefined && topic === undefined) {
+
+//       }
+
+//       if (author !== undefined && topic !== undefined) {
+//       }
+
+//       if (!articles.length) {
+//         return Promise.all([articles, getUsers(author)]);
+//       } else {
+//         return [articles];
+//       }
+
+//     })
+//     .then(() => {
+//       res.status(200).send({ articles });
+//     })
+//     .catch(next);
+//   // }
+// };
+
 exports.getArticles = (req, res, next) => {
-  console.log("Inside getArticles controller...");
+  // console.log("Inside getArticles controller...");
   const { sort_by, order, author, topic } = req.query;
-  console.log(sort_by, order, author, topic);
+
   return selectArticles(sort_by, order, author, topic)
     .then(articles => {
-      console.log("Inside then block ...");
-      console.log(articles);
       res.status(200).send({ articles });
     })
     .catch(next);
+  // }
 };
