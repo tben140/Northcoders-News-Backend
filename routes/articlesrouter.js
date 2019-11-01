@@ -7,7 +7,7 @@ const {
   getCommentsByArticleId
 } = require("../controllers/articlescontroller.js");
 
-articlesRouter.route("/articles").get(getArticles);
+articlesRouter.route("/").get(getArticles);
 
 articlesRouter
   .route("/:article_id")

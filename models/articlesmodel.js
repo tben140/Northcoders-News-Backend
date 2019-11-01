@@ -45,4 +45,23 @@ exports.selectCommentsByArticleId = (article_id, sort_by, order) => {
     });
 };
 
-exports.selectArticles = () => {};
+exports.selectArticles = (sort_by, order, author, topic) => {
+  console.log("Inside selectArticles ...");
+  return connection
+    .select("articles.*")
+    .count("comment_id", { as: "comment_count" })
+    .from("articles")
+    .leftJoin("comments", "articles.article_id", "comments.article_id")
+    .groupBy("articles.article_id")
+    .modify(query => {
+      if (sort_by) {
+        query.orderBy(sort_by, order);
+      }
+      if (author) {
+        query.where("articles.author", "=", author);
+      }
+      if (topic) {
+        query.where("topic", "=", topic);
+      }
+    });
+};
