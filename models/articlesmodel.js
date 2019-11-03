@@ -8,12 +8,12 @@ exports.selectArticlesByArticleId = article_id => {
     .count({ comment_count: "comments.article_id" })
     .leftJoin("comments", "articles.article_id", "comments.article_id")
     .groupBy("articles.article_id")
-    .then(([articles]) => {
-      return articles;
+    .then(([article]) => {
+      return article;
     });
 };
 
-exports.updateArticles = (article_id, inc_votes) => {
+exports.updateArticles = (article_id, inc_votes = 0) => {
   return connection("articles")
     .where("article_id", "=", article_id)
     .increment("votes", inc_votes)
@@ -21,13 +21,6 @@ exports.updateArticles = (article_id, inc_votes) => {
 };
 
 exports.insertCommentToArticle = (article_id, username, body) => {
-  // console.log(
-  //   "In insertCommentToArticle model ...",
-  //   article_id,
-  //   username,
-  //   body
-  // );
-
   return connection("comments")
     .insert([{ author: username, article_id: article_id, body: body }])
     .returning("*");
@@ -72,4 +65,15 @@ exports.selectArticles = (
         query.where("topic", "=", topic);
       }
     });
+};
+
+exports.checkAuthorExists = author => {
+  if (author !== undefined) {
+    return connection
+      .select("*")
+      .from("users")
+      .where("username", "=", author);
+  } else {
+    return connection.select("*").from("users");
+  }
 };

@@ -21,15 +21,13 @@ exports.makeRefObj = list => {
 
 exports.formatComments = (comments, articleRef) => {
   const output = comments.map(item => {
-    for (let i = 0; i < comments.length; i++) {
-      let outputObj = {};
-      outputObj.body = item.body;
-      outputObj.article_id = articleRef[item.belongs_to];
-      outputObj.author = item.created_by;
-      outputObj.votes = item.votes;
-      outputObj.created_at = new Date(item.created_at);
-      return outputObj;
-    }
+    let outputObj = {};
+    outputObj.body = item.body;
+    outputObj.article_id = articleRef[item.belongs_to];
+    outputObj.author = item.created_by;
+    outputObj.votes = item.votes;
+    outputObj.created_at = new Date(item.created_at);
+    return outputObj;
   });
   return output;
 };

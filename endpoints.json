@@ -10,18 +10,98 @@
     }
   },
   "GET /api/articles": {
-    "description": "serves an array of all topics",
+    "description": "serves an array of all articles",
     "queries": ["author", "topic", "sort_by", "order"],
     "exampleResponse": {
       "articles": [
         {
+          "article_id": "",
           "title": "Seafood substitutions are increasing",
           "topic": "cooking",
           "author": "weegembump",
-          "body": "Text from the article..",
-          "created_at": 1527695953341
+          "votes": "",
+          "created_at": 1527695953341,
+          "comment_count": ""
         }
       ]
     }
-  }
+  },
+  "GET /api/users/:username": {
+    "description": "serves an object of a user by a given username",
+    "queries": [],
+    "exampleResponse": {
+      "user": {
+        "username": "butter_bridge",
+        "avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg	",
+        "name": "jonny"
+      }
+    }
+  },
+  "GET /api/articles/:article_id": {
+    "description": "serves an object of an article by a given article_id",
+    "parameters": ["article_id"],
+    "exampleResponse": {
+      "article": {
+        "author": "butter_bridge",
+        "title": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg	",
+        "article_id": "jonny",
+        "body": "",
+        "topic": "",
+        "created_at": "",
+        "votes": "",
+        "comment_count": ""
+      }
+    }
+  },
+  "PATCH /api/articles/:article_id": {
+    "description": "increments the votes property of an article by a given article_id",
+    "parameters": ["article_id"],
+    "requestObject": ["inc_votes"],
+    "exampleResponse": {
+      "article": {
+        "author": "butter_bridge",
+        "title": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg	",
+        "article_id": "jonny",
+        "body": "",
+        "topic": "",
+        "created_at": "",
+        "votes": "",
+        "comment_count": ""
+      }
+    }
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "posts a new comment for an article by a given article_id",
+    "parameters": ["article_id"],
+    "requestObject": ["username", "body"],
+    "exampleResponse": {
+      "comment": {
+        "comment_id": "butter_bridge",
+        "author": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg	",
+        "article_id": "jonny",
+        "votes": "",
+        "created_at": "",
+        "body": ""
+      }
+    }
+  },
+  "GET /api/articles/:article_id/comments": {
+    "description": "serves an array of comment objects for an article by a given article_id",
+    "parameters": ["article_id"],
+    "queries": ["sort_by", "order"],
+    "exampleResponse": {
+      "comments": [
+        {
+          "comment_id": "butter_bridge",
+          "author": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg	",
+          "article_id": "jonny",
+          "votes": "",
+          "created_at": "",
+          "body": ""
+        }
+      ]
+    }
+  },
+  "PATCH /api/comments/:comment_id": {},
+  "DELETE /api/comments/:comment_id": {}
 }

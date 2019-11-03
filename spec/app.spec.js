@@ -25,7 +25,34 @@ describe("app", () => {
   });
   describe("/api", () => {
     describe("GET", () => {
-      xit("GET:200 - returns an object containing all of the available endpoints", () => {});
+      it.only("GET:200 - returns an object containing all of the available endpoints", () => {
+        return request(app)
+          .get("/api")
+          .expect(200)
+          .then(({ body }) => {
+            console.log(body);
+            // expect(topics).to.be.an("object");
+            // expect(topics).to.have.keys("topics");
+            // expect(topics.topics.length).to.equal(3);
+            // topics.topics.forEach(topic => {
+            //   expect(topic).to.have.keys(["slug", "description"]);
+            // });
+          });
+      });
+    });
+    describe("Invalid HTTP methods", () => {
+      it("HTTP status code:405 - Method Not Allowed", () => {
+        const invalidMethods = ["post", "patch", "put", "delete"];
+        const methodPromises = invalidMethods.map(method => {
+          return request(app)
+            [method]("/api")
+            .expect(405)
+            .then(({ body: { msg } }) => {
+              expect(msg).to.equal("method not allowed");
+            });
+        });
+        return Promise.all(methodPromises);
+      });
     });
     describe("/topics", () => {
       describe("GET", () => {
@@ -42,7 +69,20 @@ describe("app", () => {
               });
             });
         });
-        xdescribe("GET ERRORS", () => {});
+      });
+      describe("Invalid HTTP methods", () => {
+        it("HTTP status code:405 - Method Not Allowed", () => {
+          const invalidMethods = ["post", "patch", "put", "delete"];
+          const methodPromises = invalidMethods.map(method => {
+            return request(app)
+              [method]("/api/topics")
+              .expect(405)
+              .then(({ body: { msg } }) => {
+                expect(msg).to.equal("method not allowed");
+              });
+          });
+          return Promise.all(methodPromises);
+        });
       });
     });
     describe("/users", () => {
@@ -52,9 +92,14 @@ describe("app", () => {
             return request(app)
               .get("/api/users/butter_bridge")
               .expect(200)
-              .then(({ body: users }) => {
-                expect(users).to.be.an("object");
-                expect(users).to.have.keys(["username", "avatar_url", "name"]);
+              .then(({ body }) => {
+                console.log(body);
+                expect(body).to.be.an("object");
+                expect(body.user).to.have.keys([
+                  "username",
+                  "avatar_url",
+                  "name"
+                ]);
               });
           });
           describe("GET ERRORS", () => {
@@ -70,6 +115,20 @@ describe("app", () => {
             });
           });
         });
+        describe("Invalid HTTP methods", () => {
+          it("HTTP status code:405 - Method Not Allowed", () => {
+            const invalidMethods = ["post", "patch", "put", "delete"];
+            const methodPromises = invalidMethods.map(method => {
+              return request(app)
+                [method]("/api/users/butter_bridge")
+                .expect(405)
+                .then(({ body: { msg } }) => {
+                  expect(msg).to.equal("method not allowed");
+                });
+            });
+            return Promise.all(methodPromises);
+          });
+        });
       });
     });
     describe("/articles", () => {
@@ -80,7 +139,6 @@ describe("app", () => {
               .get("/api/articles")
               .expect(200)
               .then(({ body }) => {
-                // console.log("INSIDE POST TEST BODY ->", body);
                 expect(body).to.be.an("object");
                 expect(body.articles.length).to.equal(12);
                 body.articles.forEach(article => {
@@ -100,14 +158,13 @@ describe("app", () => {
                 });
               });
           });
-          it("GET:200 - returns an array of article objects when parameters are passed for every arguement", () => {
+          it("GET:200 - returns an array of article objects when valid arguements are passed for every paramater", () => {
             return request(app)
               .get(
                 "/api/articles?sort_by=article_id&order=desc&author=butter_bridge&topic=mitch"
               )
               .expect(200)
               .then(({ body }) => {
-                // console.log("INSIDE POST TEST BODY ->", body);
                 expect(body).to.be.an("object");
                 expect(body.articles.length).to.equal(3);
                 body.articles.forEach(article => {
@@ -145,29 +202,26 @@ describe("app", () => {
                 .get("/api/articles?sort_by=created_at&order=notAnOrder")
                 .expect(400)
                 .then(({ body }) => {
-                  // console.log("INSIDE GET TEST BODY ->", body);
                   expect(body).to.be.an("object");
                   expect(body).to.have.keys(["msg"]);
                   expect(body.msg).to.equal("Invalid sort_by value");
                 });
             });
-            xit("ERROR: 404 - author value is not in the articles table", () => {
+            it("ERROR: 404 - author value is not in the articles table", () => {
               return request(app)
                 .get("/api/articles?author=notAnAuthor")
                 .expect(404)
                 .then(({ body }) => {
-                  // console.log("INSIDE GET TEST BODY ->", body);
                   expect(body).to.be.an("object");
                   expect(body).to.have.keys(["msg"]);
                   expect(body.msg).to.equal("No articles found for author");
                 });
             });
-            xit("ERROR: 400 - topic value is not in the articles table", () => {
+            it("ERROR: 400 - topic value is not in the articles table", () => {
               return request(app)
                 .get("/api/articles?topic=notATopic")
                 .expect(404)
                 .then(({ body }) => {
-                  // console.log("INSIDE GET TEST BODY ->", body);
                   expect(body).to.be.an("object");
                   expect(body).to.have.keys(["msg"]);
                   expect(body.msg).to.equal("Topic not found");
@@ -178,7 +232,6 @@ describe("app", () => {
                 .get("/api/articles?author=lurker")
                 .expect(200)
                 .then(({ body }) => {
-                  // console.log("INSIDE GET TEST BODY ->", body);
                   expect(body).to.be.an("object");
                   expect(body).to.have.keys(["articles"]);
                   expect(body.articles).to.eql([]);
@@ -189,7 +242,6 @@ describe("app", () => {
                 .get("/api/articles?topic=paper")
                 .expect(200)
                 .then(({ body }) => {
-                  // console.log("INSIDE GET TEST BODY ->", body);
                   expect(body).to.be.an("object");
                   expect(body).to.have.keys(["articles"]);
                   expect(body.articles).to.eql([]);
@@ -197,17 +249,42 @@ describe("app", () => {
             });
           });
         });
+        describe("Invalid HTTP methods", () => {
+          it("HTTP status code:405 - Method Not Allowed", () => {
+            const invalidMethods = ["post", "patch", "put", "delete"];
+            const methodPromises = invalidMethods.map(method => {
+              return request(app)
+                [method]("/api/articles")
+                .expect(405)
+                .then(({ body: { msg } }) => {
+                  expect(msg).to.equal("method not allowed");
+                });
+            });
+            return Promise.all(methodPromises);
+          });
+        });
       });
       describe("/:article_id", () => {
         describe("/comments", () => {
           describe("GET", () => {
+            it("GET:200 - returns an empty object when the article_id is valid but no comments exist", () => {
+              return request(app)
+                .get("/api/articles/2/comments")
+                .expect(200)
+                .then(({ body }) => {
+                  console.log("TEST body ->", body);
+                  expect(body).to.be.an("object");
+                  expect(body.comments).to.be.eql([]);
+                });
+            });
             it("GET:200 - returns a JSON object of comments with default sorting", () => {
               return request(app)
                 .get("/api/articles/1/comments")
                 .expect(200)
                 .then(({ body }) => {
-                  // console.log("INSIDE POST TEST BODY ->", body);
+                  console.log(body);
                   expect(body).to.be.an("object");
+                  expect(body.comments).to.be.an("array");
                   expect(body.comments.length).to.equal(13);
                   body.comments.forEach(comment => {
                     expect(comment).to.have.keys([
@@ -229,7 +306,6 @@ describe("app", () => {
                 .get("/api/articles/1/comments?sort_by=votes&order=desc")
                 .expect(200)
                 .then(({ body }) => {
-                  // console.log("INSIDE POST TEST BODY ->", body);
                   expect(body).to.be.an("object");
                   expect(body.comments.length).to.equal(13);
                   body.comments.forEach(comment => {
@@ -253,7 +329,6 @@ describe("app", () => {
                   .get("/api/articles/abc/comments")
                   .expect(400)
                   .then(({ body }) => {
-                    // console.log("INSIDE POST TEST BODY ->", body);
                     expect(body).to.be.an("object");
                     expect(body).to.have.keys(["msg"]);
                     expect(body.msg).to.equal(
@@ -266,7 +341,6 @@ describe("app", () => {
                   .get("/api/articles/9999/comments")
                   .expect(404)
                   .then(({ body }) => {
-                    // console.log("INSIDE POST TEST BODY ->", body);
                     expect(body).to.be.an("object");
                     expect(body).to.have.keys(["msg"]);
                     expect(body.msg).to.equal("article_id not found");
@@ -281,9 +355,8 @@ describe("app", () => {
                 .send({ username: "rogersop", body: "THIS IS A TEST COMMENT" })
                 .expect(201)
                 .then(({ body }) => {
-                  // console.log("INSIDE POST TEST BODY ->", body);
                   expect(body).to.be.an("object");
-                  expect(body.comments[0]).to.have.keys([
+                  expect(body.comment).to.have.keys([
                     "comment_id",
                     "author",
                     "article_id",
@@ -300,7 +373,6 @@ describe("app", () => {
                   .send({ username: "butter_bridge", body: "Test comment" })
                   .expect(400)
                   .then(({ body }) => {
-                    // console.log("INSIDE POST TEST BODY ->", body);
                     expect(body).to.be.an("object");
                     expect(body).to.have.keys(["msg"]);
                     expect(body.msg).to.equal(
@@ -314,7 +386,8 @@ describe("app", () => {
                   .send({ username: "butter_bridge", body: "Test comment" })
                   .expect(404)
                   .then(({ body }) => {
-                    // console.log("INSIDE POST TEST BODY ->", body);
+                    console.log("TEST body ->", body);
+                    console.log("BODY msg ->", body.msg);
                     expect(body).to.be.an("object");
                     expect(body).to.have.keys(["msg"]);
                     expect(body.msg).to.equal("article_id not found");
@@ -326,7 +399,6 @@ describe("app", () => {
                   .send({ username: "Ben", body: "Test comment" })
                   .expect(404)
                   .then(({ body }) => {
-                    // console.log("INSIDE POST TEST BODY ->", body);
                     expect(body).to.be.an("object");
                     expect(body).to.have.keys(["msg"]);
                     expect(body.msg).to.equal("username not found");
@@ -338,7 +410,6 @@ describe("app", () => {
                   .send({ username: "Ben" })
                   .expect(404)
                   .then(({ body }) => {
-                    // console.log("INSIDE POST TEST BODY ->", body);
                     expect(body).to.be.an("object");
                     expect(body).to.have.keys(["msg"]);
                     expect(body.msg).to.equal(
@@ -346,6 +417,23 @@ describe("app", () => {
                     );
                   });
               });
+              xit("ERROR: 400 - Request does not include username in the request body", () => {});
+              xit("ERROR: 400 - Request does not include body in the request body", () => {});
+              xit("ERROR: 400 - Request does not include username and body in the request body", () => {});
+            });
+          });
+          describe("Invalid HTTP methods", () => {
+            it("HTTP status code:405 - Method Not Allowed", () => {
+              const invalidMethods = ["patch", "put", "delete"];
+              const methodPromises = invalidMethods.map(method => {
+                return request(app)
+                  [method]("/api/articles/1/comments")
+                  .expect(405)
+                  .then(({ body: { msg } }) => {
+                    expect(msg).to.equal("method not allowed");
+                  });
+              });
+              return Promise.all(methodPromises);
             });
           });
         });
@@ -354,16 +442,16 @@ describe("app", () => {
             return request(app)
               .get("/api/articles/1")
               .expect(200)
-              .then(({ body: article }) => {
-                expect(article).to.be.an("object");
+              .then(({ body }) => {
+                expect(body).to.be.an("object");
               });
           });
           it("GET:200 - returns an object with the expected keys", () => {
             return request(app)
               .get("/api/articles/1")
               .expect(200)
-              .then(({ body: article }) => {
-                expect(article).to.contain.keys(
+              .then(({ body }) => {
+                expect(body.article).to.contain.keys(
                   "author",
                   "title",
                   "article_id",
@@ -389,7 +477,6 @@ describe("app", () => {
                 .get("/api/articles/abc")
                 .expect(400)
                 .then(({ body }) => {
-                  // console.log("TEST body ->", body);
                   expect(body.msg).to.equal(
                     ' invalid input syntax for type integer: "abc"'
                   );
@@ -398,14 +485,15 @@ describe("app", () => {
           });
         });
         describe("PATCH", () => {
-          it("PATCH:201 - Increase vote value by 1 for the specified article_id and return the updated article as an object", () => {
+          it("PATCH:200 - Increase vote value by 1 for the specified article_id and return the updated article as an object", () => {
             return request(app)
               .patch("/api/articles/6")
               .send({ inc_votes: 1 })
-              .expect(201)
-              .then(({ body: { articleObj } }) => {
-                expect(articleObj).to.be.an("object");
-                expect(articleObj).to.have.keys([
+              .expect(200)
+              .then(({ body }) => {
+                console.log("TEST article", body);
+                expect(body).to.be.an("object");
+                expect(body.article).to.have.keys([
                   "article_id",
                   "title",
                   "body",
@@ -414,17 +502,17 @@ describe("app", () => {
                   "author",
                   "created_at"
                 ]);
-                expect(articleObj.votes).to.equal(1);
+                expect(body.article.votes).to.equal(1);
               });
           });
-          it("PATCH:201 - Decrease vote value by 10 for the specified article_id and return the updated article as an object", () => {
+          it("PATCH:200 - Decrease vote value by 10 for the specified article_id and return the updated article as an object", () => {
             return request(app)
               .patch("/api/articles/6")
               .send({ inc_votes: -10 })
-              .expect(201)
-              .then(({ body: { articleObj } }) => {
-                expect(articleObj).to.be.an("object");
-                expect(articleObj).to.have.keys([
+              .expect(200)
+              .then(({ body }) => {
+                expect(body).to.be.an("object");
+                expect(body.article).to.have.keys([
                   "article_id",
                   "title",
                   "body",
@@ -433,7 +521,7 @@ describe("app", () => {
                   "author",
                   "created_at"
                 ]);
-                expect(articleObj.votes).to.equal(-10);
+                expect(body.article.votes).to.equal(-10);
               });
           });
           describe("PATCH ERRORS", () => {
@@ -441,10 +529,9 @@ describe("app", () => {
               return request(app)
                 .patch("/api/articles/6")
                 .send({})
-                .expect(400)
+                .expect(200)
                 .then(({ body }) => {
-                  // console.log("TEST body ->", body);
-                  expect(body.msg).to.equal("No inc_votes on request body");
+                  expect(body.article.votes).to.equal(0);
                 });
             });
             it("ERROR: 400 - Invalid inc_votes value", () => {
@@ -471,20 +558,34 @@ describe("app", () => {
             });
           });
         });
+        describe("Invalid HTTP methods", () => {
+          it("HTTP status code:405 - Method Not Allowed", () => {
+            const invalidMethods = ["post", "put", "delete"];
+            const methodPromises = invalidMethods.map(method => {
+              return request(app)
+                [method]("/api/articles/1")
+                .expect(405)
+                .then(({ body: { msg } }) => {
+                  expect(msg).to.equal("method not allowed");
+                });
+            });
+            return Promise.all(methodPromises);
+          });
+        });
       });
     });
     describe("/comments", () => {
       describe("/:comment_id", () => {
         describe("PATCH", () => {
-          it("PATCH:201 - Returns comment object with a correctly updated votes value", () => {
+          it("PATCH:200 - Returns comment object with a correctly updated votes value", () => {
             return request(app)
               .patch("/api/comments/6")
               .send({ inc_votes: 1 })
-              .expect(201)
+              .expect(200)
               .then(({ body }) => {
-                // console.log("INSIDE POST TEST BODY ->", body);
+                console.log("TEST body ->", body);
                 expect(body).to.be.an("object");
-                expect(body.comment[0]).to.have.keys([
+                expect(body.comment).to.have.keys([
                   "comment_id",
                   "author",
                   "article_id",
@@ -492,18 +593,17 @@ describe("app", () => {
                   "created_at",
                   "body"
                 ]);
-                expect(body.comment[0].votes).to.equal(1);
+                expect(body.comment.votes).to.equal(1);
               });
           });
-          it("PATCH:201 - Returns comment object with a correctly decremented votes value", () => {
+          it("PATCH:200 - Returns comment object with a correctly decremented votes value", () => {
             return request(app)
               .patch("/api/comments/6")
               .send({ inc_votes: -10 })
-              .expect(201)
+              .expect(200)
               .then(({ body }) => {
-                // console.log("INSIDE POST TEST BODY ->", body);
                 expect(body).to.be.an("object");
-                expect(body.comment[0]).to.have.keys([
+                expect(body.comment).to.have.keys([
                   "comment_id",
                   "author",
                   "article_id",
@@ -511,7 +611,7 @@ describe("app", () => {
                   "created_at",
                   "body"
                 ]);
-                expect(body.comment[0].votes).to.equal(-10);
+                expect(body.comment.votes).to.equal(-10);
               });
           });
           describe("PATCH ERRORS", () => {
@@ -521,7 +621,6 @@ describe("app", () => {
                 .send({ inc_votes: 1 })
                 .expect(404)
                 .then(({ body }) => {
-                  // console.log("TEST body ->", body);
                   expect(body.msg).to.equal("comment_id not found");
                 });
             });
@@ -531,7 +630,6 @@ describe("app", () => {
                 .send({ inc_votes: 1 })
                 .expect(400)
                 .then(({ body }) => {
-                  // console.log("TEST body ->", body);
                   expect(body.msg).to.equal(
                     ' invalid input syntax for type integer: "abc"'
                   );
@@ -543,7 +641,6 @@ describe("app", () => {
                 .send({ inc_votes: "abc" })
                 .expect(400)
                 .then(({ body }) => {
-                  // console.log("TEST body ->", body);
                   expect(body.msg).to.equal(
                     ' invalid input syntax for type integer: "NaN"'
                   );
@@ -555,7 +652,6 @@ describe("app", () => {
                 .send({ not_votes: "abc" })
                 .expect(400)
                 .then(({ body }) => {
-                  // console.log("TEST body ->", body);
                   expect(body.msg).to.equal("inc_votes not in body");
                 });
             });
@@ -567,7 +663,6 @@ describe("app", () => {
               .delete("/api/comments/2")
               .expect(204)
               .then(comment => {
-                // console.log("Inside then block, comment ->", comment.body);
                 expect(comment.body).to.eql({});
               });
           });
@@ -577,7 +672,6 @@ describe("app", () => {
                 .delete("/api/comments/99")
                 .expect(404)
                 .then(comment => {
-                  // console.log("Inside then block, comment ->", comment.body);
                   expect(comment.body).to.eql({ msg: "comment_id not found" });
                 });
             });
@@ -586,12 +680,25 @@ describe("app", () => {
                 .delete("/api/comments/abc")
                 .expect(400)
                 .then(comment => {
-                  // console.log("Inside then block, comment ->", comment.body);
                   expect(comment.body).to.eql({
                     msg: ' invalid input syntax for type integer: "abc"'
                   });
                 });
             });
+          });
+        });
+        describe("Invalid HTTP methods", () => {
+          it("HTTP status code:405 - Method Not Allowed", () => {
+            const invalidMethods = ["get", "post", "put"];
+            const methodPromises = invalidMethods.map(method => {
+              return request(app)
+                [method]("/api/comments/1")
+                .expect(405)
+                .then(({ body: { msg } }) => {
+                  expect(msg).to.equal("method not allowed");
+                });
+            });
+            return Promise.all(methodPromises);
           });
         });
       });
