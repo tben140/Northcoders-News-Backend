@@ -77,3 +77,8 @@ exports.checkAuthorExists = author => {
     return connection.select("*").from("users");
   }
 };
+
+exports.checkTopicExists = topic => {
+  if (topic !== undefined) {
+  }
+};

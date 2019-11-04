@@ -25,7 +25,7 @@ describe("app", () => {
   });
   describe("/api", () => {
     describe("GET", () => {
-      it.only("GET:200 - returns an object containing all of the available endpoints", () => {
+      xit("GET:200 - returns an object containing all of the available endpoints", () => {
         return request(app)
           .get("/api")
           .expect(200)
@@ -93,7 +93,6 @@ describe("app", () => {
               .get("/api/users/butter_bridge")
               .expect(200)
               .then(({ body }) => {
-                console.log(body);
                 expect(body).to.be.an("object");
                 expect(body.user).to.have.keys([
                   "username",
@@ -139,6 +138,7 @@ describe("app", () => {
               .get("/api/articles")
               .expect(200)
               .then(({ body }) => {
+                console.log(body);
                 expect(body).to.be.an("object");
                 expect(body.articles.length).to.equal(12);
                 body.articles.forEach(article => {
@@ -272,7 +272,6 @@ describe("app", () => {
                 .get("/api/articles/2/comments")
                 .expect(200)
                 .then(({ body }) => {
-                  console.log("TEST body ->", body);
                   expect(body).to.be.an("object");
                   expect(body.comments).to.be.eql([]);
                 });
@@ -282,7 +281,6 @@ describe("app", () => {
                 .get("/api/articles/1/comments")
                 .expect(200)
                 .then(({ body }) => {
-                  console.log(body);
                   expect(body).to.be.an("object");
                   expect(body.comments).to.be.an("array");
                   expect(body.comments.length).to.equal(13);
@@ -393,7 +391,7 @@ describe("app", () => {
                     expect(body.msg).to.equal("article_id not found");
                   });
               });
-              xit("ERROR: 404 - username not found", () => {
+              it("ERROR: 404 - username not found", () => {
                 return request(app)
                   .post("/api/articles/1/comments")
                   .send({ username: "Ben", body: "Test comment" })
@@ -491,7 +489,6 @@ describe("app", () => {
               .send({ inc_votes: 1 })
               .expect(200)
               .then(({ body }) => {
-                console.log("TEST article", body);
                 expect(body).to.be.an("object");
                 expect(body.article).to.have.keys([
                   "article_id",
@@ -583,7 +580,6 @@ describe("app", () => {
               .send({ inc_votes: 1 })
               .expect(200)
               .then(({ body }) => {
-                console.log("TEST body ->", body);
                 expect(body).to.be.an("object");
                 expect(body.comment).to.have.keys([
                   "comment_id",

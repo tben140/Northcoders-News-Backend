@@ -43,7 +43,12 @@ exports.postCommentToArticle = (req, res, next) => {
   const { username, body } = req.body;
 
   return insertCommentToArticle(article_id, username, body)
-    .then(([comment]) => {
+    .then(insertedComment => {
+      // console.log("insertedComment ->", insertedComment);
+      // if (insertedComment.length === 0) {
+      //   res.status(404).send({ msg: "article_id not found" });
+      // }
+      const [comment] = insertedComment;
       res.status(201).send({ comment });
     })
     .catch(next);
@@ -55,6 +60,9 @@ exports.getCommentsByArticleId = (req, res, next) => {
 
   return selectCommentsByArticleId(article_id, sort_by, order)
     .then(comments => {
+      if (comments.length === 0) {
+        res.status(404).send({ msg: "article_id not found" });
+      }
       res.status(200).send({ comments });
     })
     .catch(next);
