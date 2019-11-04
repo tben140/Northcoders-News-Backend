@@ -17,7 +17,7 @@ exports.up = function(knex) {
       .timestamp("created_at")
       .defaultTo(knex.fn.now())
       .notNullable();
-    commentTable.string("body").notNullable();
+    commentTable.string("body", [500]).notNullable();
   });
 };
 
