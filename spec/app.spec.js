@@ -25,18 +25,31 @@ describe("app", () => {
   });
   describe("/api", () => {
     describe("GET", () => {
-      xit("GET:200 - returns an object containing all of the available endpoints", () => {
+      it("GET:200 - returns an object", () => {
         return request(app)
           .get("/api")
           .expect(200)
           .then(({ body }) => {
-            console.log(body);
-            // expect(topics).to.be.an("object");
-            // expect(topics).to.have.keys("topics");
-            // expect(topics.topics.length).to.equal(3);
-            // topics.topics.forEach(topic => {
-            //   expect(topic).to.have.keys(["slug", "description"]);
-            // });
+            expect(body).to.be.an("object");
+          });
+      });
+      it("GET:200 - the returned object contains all of the expected endpoints", () => {
+        return request(app)
+          .get("/api")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body).to.have.keys([
+              "GET /api/topics",
+              "GET /api/users/:username",
+              "GET /api/articles/:article_id",
+              "PATCH /api/articles/:article_id",
+              "POST /api/articles/:article_id/comments",
+              "GET /api/articles/:article_id/comments",
+              "GET /api/articles",
+              "PATCH /api/comments/:comment_id",
+              "DELETE /api/comments/:comment_id",
+              "GET /api"
+            ]);
           });
       });
     });
@@ -56,15 +69,22 @@ describe("app", () => {
     });
     describe("/topics", () => {
       describe("GET", () => {
-        it("GET:200 - returns an array of topics", () => {
+        it("GET:200 - returns an object with a key value of topics", () => {
           return request(app)
             .get("/api/topics")
             .expect(200)
-            .then(({ body: topics }) => {
-              expect(topics).to.be.an("object");
-              expect(topics).to.have.keys("topics");
-              expect(topics.topics.length).to.equal(3);
-              topics.topics.forEach(topic => {
+            .then(({ body }) => {
+              expect(body).to.be.an("object");
+              expect(body).to.have.keys("topics");
+            });
+        });
+        it("GET:200 - the topics key has an array of objects, each containing the expected keys", () => {
+          return request(app)
+            .get("/api/topics")
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.topics).to.be.an("array");
+              body.topics.forEach(topic => {
                 expect(topic).to.have.keys(["slug", "description"]);
               });
             });
@@ -88,7 +108,16 @@ describe("app", () => {
     describe("/users", () => {
       describe("/:username", () => {
         describe("GET", () => {
-          it("GET:200 - returns an object containing username,avatar_url and name when a username that is present in the users table has been passed", () => {
+          it("GET:200 - returns an object", () => {
+            return request(app)
+              .get("/api/users/butter_bridge")
+              .expect(200)
+              .then(({ body }) => {
+                expect(body).to.be.an("object");
+                expect(body).to.have.keys(["user"]);
+              });
+          });
+          it("GET:200 - the user key has an object containing the expected keys", () => {
             return request(app)
               .get("/api/users/butter_bridge")
               .expect(200)
@@ -133,14 +162,20 @@ describe("app", () => {
     describe("/articles", () => {
       describe("/", () => {
         describe("GET", () => {
-          it("GET:200 - returns an array of article objects with default sorting (created_at, desc) when no parameters are passed", () => {
+          it("GET:200 - returns an object with a key value of articles", () => {
             return request(app)
               .get("/api/articles")
               .expect(200)
               .then(({ body }) => {
-                console.log(body);
                 expect(body).to.be.an("object");
-                expect(body.articles.length).to.equal(12);
+                expect(body).to.have.keys("articles");
+              });
+          });
+          it("GET:200 - each object in the articles array have the expected keys", () => {
+            return request(app)
+              .get("/api/articles")
+              .expect(200)
+              .then(({ body }) => {
                 body.articles.forEach(article => {
                   expect(article).to.have.keys([
                     "article_id",
@@ -152,36 +187,57 @@ describe("app", () => {
                     "created_at",
                     "comment_count"
                   ]);
-                  expect(body.articles).to.be.sortedBy("created_at", {
-                    descending: true
-                  });
                 });
               });
           });
-          it("GET:200 - returns an array of article objects when valid arguements are passed for every paramater", () => {
+          it("GET:200 - array of article objects has default sorting (created_at, desc) when no parameters are passed", () => {
             return request(app)
-              .get(
-                "/api/articles?sort_by=article_id&order=desc&author=butter_bridge&topic=mitch"
-              )
+              .get("/api/articles")
               .expect(200)
               .then(({ body }) => {
-                expect(body).to.be.an("object");
-                expect(body.articles.length).to.equal(3);
-                body.articles.forEach(article => {
-                  expect(article).to.have.keys([
-                    "article_id",
-                    "title",
-                    "body",
-                    "votes",
-                    "topic",
-                    "author",
-                    "created_at",
-                    "comment_count"
-                  ]);
+                expect(body.articles).to.be.sortedBy("created_at", {
+                  descending: true
                 });
-                // body.articles.forEach(article => {
-                //   expect(article.comment_count).to.equal()
-                // })
+              });
+          });
+          it("GET:200 - array of article objects is sorted by the passed column with the default sort order (descending)", () => {
+            return request(app)
+              .get("/api/articles?sort_by=votes")
+              .expect(200)
+              .then(({ body }) => {
+                expect(body.articles).to.be.sortedBy("votes", {
+                  descending: true
+                });
+              });
+          });
+          it("GET:200 - array of article objects is sorted by the default column (created_at) and the order is set by the passed order", () => {
+            return request(app)
+              .get("/api/articles?order=asc")
+              .expect(200)
+              .then(({ body }) => {
+                expect(body.articles).to.be.sortedBy("created_at", {
+                  ascending: true
+                });
+              });
+          });
+          it("GET:200 - returns an array of article objects which contain the passed author", () => {
+            return request(app)
+              .get("/api/articles?author=butter_bridge")
+              .expect(200)
+              .then(({ body }) => {
+                body.articles.forEach(article => {
+                  expect(article.author).to.equal("butter_bridge");
+                });
+              });
+          });
+          it("GET:200 - returns an array of article objects which contain the passed topic", () => {
+            return request(app)
+              .get("/api/articles?topic=mitch")
+              .expect(200)
+              .then(({ body }) => {
+                body.articles.forEach(article => {
+                  expect(article.topic).to.equal("mitch");
+                });
               });
           });
           describe("GET ERRORS", () => {
@@ -197,34 +253,38 @@ describe("app", () => {
                   );
                 });
             });
-            xit("ERROR: 400 - order value is not 'asc' or 'desc'", () => {
+            it("ERROR: 400 - order value is not 'asc' or 'desc'", () => {
               return request(app)
-                .get("/api/articles?sort_by=created_at&order=notAnOrder")
+                .get("/api/articles?order=notAnOrder")
                 .expect(400)
                 .then(({ body }) => {
                   expect(body).to.be.an("object");
                   expect(body).to.have.keys(["msg"]);
-                  expect(body.msg).to.equal("Invalid sort_by value");
+                  expect(body.msg).to.equal("Invalid order value");
                 });
             });
-            it("ERROR: 404 - author value is not in the articles table", () => {
+            it("ERROR: 404 - author does not exist in the users table", () => {
               return request(app)
                 .get("/api/articles?author=notAnAuthor")
                 .expect(404)
                 .then(({ body }) => {
                   expect(body).to.be.an("object");
                   expect(body).to.have.keys(["msg"]);
-                  expect(body.msg).to.equal("No articles found for author");
+                  expect(body.msg).to.equal(
+                    "Author not found in the users table"
+                  );
                 });
             });
-            it("ERROR: 400 - topic value is not in the articles table", () => {
+            it("ERROR: 404 - topic value does not exist in the topics table", () => {
               return request(app)
                 .get("/api/articles?topic=notATopic")
                 .expect(404)
                 .then(({ body }) => {
                   expect(body).to.be.an("object");
                   expect(body).to.have.keys(["msg"]);
-                  expect(body.msg).to.equal("Topic not found");
+                  expect(body.msg).to.equal(
+                    "Topic not found in the topics table"
+                  );
                 });
             });
             it("ERROR: 200 - author exists but no articles are linked to this author", () => {
@@ -378,14 +438,12 @@ describe("app", () => {
                     );
                   });
               });
-              xit("ERROR: 404 - article_id not found", () => {
+              it("ERROR: 404 - article_id not found", () => {
                 return request(app)
                   .post("/api/articles/9999/comments")
                   .send({ username: "butter_bridge", body: "Test comment" })
                   .expect(404)
                   .then(({ body }) => {
-                    console.log("TEST body ->", body);
-                    console.log("BODY msg ->", body.msg);
                     expect(body).to.be.an("object");
                     expect(body).to.have.keys(["msg"]);
                     expect(body.msg).to.equal("article_id not found");
@@ -402,11 +460,11 @@ describe("app", () => {
                     expect(body.msg).to.equal("username not found");
                   });
               });
-              xit("ERROR: 400 - No comment inside body", () => {
+              it("ERROR: 400 - No comment inside body", () => {
                 return request(app)
                   .post("/api/articles/1/comments")
-                  .send({ username: "Ben" })
-                  .expect(404)
+                  .send({ username: "Ben", body: "" })
+                  .expect(400)
                   .then(({ body }) => {
                     expect(body).to.be.an("object");
                     expect(body).to.have.keys(["msg"]);
@@ -415,9 +473,32 @@ describe("app", () => {
                     );
                   });
               });
-              xit("ERROR: 400 - Request does not include username in the request body", () => {});
-              xit("ERROR: 400 - Request does not include body in the request body", () => {});
-              xit("ERROR: 400 - Request does not include username and body in the request body", () => {});
+              it("ERROR: 400 - Request does not include username in the request body", () => {
+                return request(app)
+                  .post("/api/articles/1/comments")
+                  .send({ body: "Test comment" })
+                  .expect(400)
+                  .then(({ body }) => {
+                    expect(body).to.be.an("object");
+                    expect(body).to.have.keys(["msg"]);
+                    expect(body.msg).to.equal(
+                      "username not in the request body"
+                    );
+                  });
+              });
+              it("ERROR: 400 - Request does not include body in the request body", () => {
+                return request(app)
+                  .post("/api/articles/1/comments")
+                  .send({ username: "Ben" })
+                  .expect(400)
+                  .then(({ body }) => {
+                    expect(body).to.be.an("object");
+                    expect(body).to.have.keys(["msg"]);
+                    expect(body.msg).to.equal(
+                      "comment body not in the request body"
+                    );
+                  });
+              });
             });
           });
           describe("Invalid HTTP methods", () => {

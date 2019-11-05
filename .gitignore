@@ -1,5 +1,6 @@
 node_modules
 knexfile.js
-.vscode/
+.vscode
 query.sql
 notesfromqanda.txt
+.DS_Store

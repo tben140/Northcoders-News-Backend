@@ -4,7 +4,9 @@ const {
   insertCommentToArticle,
   selectCommentsByArticleId,
   selectArticles,
-  checkAuthorExists
+  checkAuthorExists,
+  checkTopicExists,
+  checkforArticleId
 } = require("../models/articlesmodel.js");
 
 exports.getArticlesByArticleId = (req, res, next) => {
@@ -42,12 +44,36 @@ exports.postCommentToArticle = (req, res, next) => {
   const { article_id } = req.params;
   const { username, body } = req.body;
 
-  return insertCommentToArticle(article_id, username, body)
+  if (username === undefined) {
+    res.status(400).send({ msg: "username not in the request body" });
+  }
+  if (body === undefined) {
+    res.status(400).send({ msg: "comment body not in the request body" });
+  }
+  if (body === "") {
+    res.status(400).send({ msg: "No comment body inside the send body" });
+  }
+
+  checkAuthorExists(username)
+    .then(user => {
+      if (user.length === 0) {
+        res.status(404).send({ msg: "username not found" });
+      }
+    })
+    .catch(next);
+
+  checkforArticleId(article_id)
+    .then(article => {
+      if (article.length === 0) {
+        return Promise.reject({
+          status: 404,
+          msg: "article_id not found"
+        });
+      } else {
+        return insertCommentToArticle(article_id, username, body);
+      }
+    })
     .then(insertedComment => {
-      // console.log("insertedComment ->", insertedComment);
-      // if (insertedComment.length === 0) {
-      //   res.status(404).send({ msg: "article_id not found" });
-      // }
       const [comment] = insertedComment;
       res.status(201).send({ comment });
     })
@@ -58,10 +84,18 @@ exports.getCommentsByArticleId = (req, res, next) => {
   const { article_id } = req.params;
   const { sort_by, order } = req.query;
 
+  selectArticlesByArticleId(article_id)
+    .then(articles => {
+      if (articles === undefined) {
+        res.status(404).send({ msg: "article_id not found" });
+      }
+    })
+    .catch(next);
+
   return selectCommentsByArticleId(article_id, sort_by, order)
     .then(comments => {
       if (comments.length === 0) {
-        res.status(404).send({ msg: "article_id not found" });
+        res.status(200).send({ comments });
       }
       res.status(200).send({ comments });
     })
@@ -70,26 +104,24 @@ exports.getCommentsByArticleId = (req, res, next) => {
 
 exports.getArticles = (req, res, next) => {
   const { sort_by, order, author, topic } = req.query;
-  checkAuthorExists(author)
-    .then(authorCheck => {
-      if (authorCheck.length === 0) {
-        return Promise.reject({
-          status: 404,
-          msg: "No articles found for author"
-        });
+
+  Promise.all([checkAuthorExists(author), checkTopicExists(topic), order])
+    .then(promiseResult => {
+      if (promiseResult[0].length === 0) {
+        res.status(404).send({ msg: "Author not found in the users table" });
+      } else if (promiseResult[1].length === 0) {
+        res.status(404).send({ msg: "Topic not found in the topics table" });
+      } else if (
+        promiseResult[2] !== undefined &&
+        (promiseResult[2] !== "asc" || promiseResult[2] !== "desc")
+      ) {
+        res.status(400).send({ msg: "Invalid order value" });
       } else {
         return selectArticles(sort_by, order, author, topic);
       }
     })
-    .then(topicCheck => {})
     .then(articles => {
       res.status(200).send({ articles });
     })
     .catch(next);
-
-  // return selectArticles(sort_by, order, author, topic)
-  //   .then(articles => {
-  //     res.status(200).send({ articles });
-  //   })
-  //   .catch(next);
 };

@@ -80,5 +80,15 @@ exports.checkAuthorExists = author => {
 
 exports.checkTopicExists = topic => {
   if (topic !== undefined) {
+    return connection
+      .select("*")
+      .from("topics")
+      .where("slug", "=", topic);
+  } else {
+    return connection.select("*").from("topics");
   }
+};
+
+exports.checkforArticleId = article_id => {
+  return connection("articles").where("article_id", article_id);
 };

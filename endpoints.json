@@ -32,7 +32,7 @@
     "exampleResponse": {
       "user": {
         "username": "butter_bridge",
-        "avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg	",
+        "avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg",
         "name": "jonny"
       }
     }
@@ -43,7 +43,7 @@
     "exampleResponse": {
       "article": {
         "author": "butter_bridge",
-        "title": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg	",
+        "title": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg",
         "article_id": "jonny",
         "body": "",
         "topic": "",
@@ -60,7 +60,7 @@
     "exampleResponse": {
       "article": {
         "author": "butter_bridge",
-        "title": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg	",
+        "title": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg",
         "article_id": "jonny",
         "body": "",
         "topic": "",
@@ -77,7 +77,7 @@
     "exampleResponse": {
       "comment": {
         "comment_id": "butter_bridge",
-        "author": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg	",
+        "author": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg",
         "article_id": "jonny",
         "votes": "",
         "created_at": "",
@@ -93,7 +93,7 @@
       "comments": [
         {
           "comment_id": "butter_bridge",
-          "author": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg	",
+          "author": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg",
           "article_id": "jonny",
           "votes": "",
           "created_at": "",

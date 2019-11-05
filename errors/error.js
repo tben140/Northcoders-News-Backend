@@ -1,5 +1,4 @@
 exports.handleCustomErrors = (err, req, res, next) => {
-  // console.log("Handle Custom Errors ->", err);
   if (err.status === 400) {
     res.status(400).send({ msg: err.msg || "Bad Request" });
   } else if (err.status === 404) {
@@ -8,7 +7,6 @@ exports.handleCustomErrors = (err, req, res, next) => {
 };
 
 exports.psqlErrorHandler = (err, req, res, next) => {
-  // console.log("Handle PSQL Errors ->", err);
   const psqlCodes = ["22P02", "42703", "23503"];
   if (psqlCodes.includes(err.code)) {
     const splitMsg = err.message.split("-")[1];
