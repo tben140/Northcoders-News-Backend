@@ -6,6 +6,7 @@ const {
   selectArticles,
   checkAuthorExists,
   checkTopicExists,
+  checkValidOrder,
   checkforArticleId
 } = require("../models/articlesmodel.js");
 
@@ -105,17 +106,16 @@ exports.getCommentsByArticleId = (req, res, next) => {
 exports.getArticles = (req, res, next) => {
   const { sort_by, order, author, topic } = req.query;
 
-  Promise.all([checkAuthorExists(author), checkTopicExists(topic), order])
+  Promise.all([
+    checkAuthorExists(author),
+    checkTopicExists(topic),
+    checkValidOrder(order)
+  ])
     .then(promiseResult => {
       if (promiseResult[0].length === 0) {
         res.status(404).send({ msg: "Author not found in the users table" });
       } else if (promiseResult[1].length === 0) {
         res.status(404).send({ msg: "Topic not found in the topics table" });
-      } else if (
-        promiseResult[2] !== undefined &&
-        (promiseResult[2] !== "asc" || promiseResult[2] !== "desc")
-      ) {
-        res.status(400).send({ msg: "Invalid order value" });
       } else {
         return selectArticles(sort_by, order, author, topic);
       }

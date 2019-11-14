@@ -89,6 +89,17 @@ exports.checkTopicExists = topic => {
   }
 };
 
+exports.checkValidOrder = order => {
+  if (order !== undefined && order !== "asc" && order !== "desc") {
+    return Promise.reject({
+      status: 400,
+      msg: "Invalid order value"
+    });
+  } else if (order === undefined || order === "asc" || order === "desc") {
+    return Promise.resolve(order);
+  }
+};
+
 exports.checkforArticleId = article_id => {
   return connection("articles").where("article_id", article_id);
 };

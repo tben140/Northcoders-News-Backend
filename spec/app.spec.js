@@ -210,7 +210,7 @@ describe("app", () => {
                 });
               });
           });
-          it.only("GET:200 - array of article objects is sorted by the default column (created_at) and the order is set by the passed order", () => {
+          it("GET:200 - array of article objects is sorted by the default column (created_at) and the order is set by the passed order", () => {
             return request(app)
               .get("/api/articles?order=asc")
               .expect(200)
