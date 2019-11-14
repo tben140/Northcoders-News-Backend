@@ -210,7 +210,7 @@ describe("app", () => {
                 });
               });
           });
-          it("GET:200 - array of article objects is sorted by the default column (created_at) and the order is set by the passed order", () => {
+          it.only("GET:200 - array of article objects is sorted by the default column (created_at) and the order is set by the passed order", () => {
             return request(app)
               .get("/api/articles?order=asc")
               .expect(200)
@@ -691,6 +691,31 @@ describe("app", () => {
                 expect(body.comment.votes).to.equal(-10);
               });
           });
+          it("PATCH:200 - Returns an unchanged comment object when no inc_votes is provided in the request body", () => {
+            return request(app)
+              .patch("/api/comments/1")
+              .send({ not_votes: "abc" })
+              .expect(200)
+              .then(({ body }) => {
+                expect(body.comment).to.eql({
+                  comment_id: 1,
+                  author: "butter_bridge",
+                  article_id: 9,
+                  votes: 16,
+                  created_at: "2017-11-22T12:36:03.389Z",
+                  body:
+                    "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!"
+                });
+                expect(body.comment).to.have.keys([
+                  "comment_id",
+                  "author",
+                  "article_id",
+                  "votes",
+                  "created_at",
+                  "body"
+                ]);
+              });
+          });
           describe("PATCH ERRORS", () => {
             it("ERROR 404 - comment_id not found", () => {
               return request(app)
@@ -721,15 +746,6 @@ describe("app", () => {
                   expect(body.msg).to.equal(
                     ' invalid input syntax for type integer: "NaN"'
                   );
-                });
-            });
-            it("ERROR 400 - inc_votes is not in the body", () => {
-              return request(app)
-                .patch("/api/comments/1")
-                .send({ not_votes: "abc" })
-                .expect(400)
-                .then(({ body }) => {
-                  expect(body.msg).to.equal("inc_votes not in body");
                 });
             });
           });

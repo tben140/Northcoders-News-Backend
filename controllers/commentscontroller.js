@@ -4,20 +4,16 @@ exports.patchComment = (req, res, next) => {
   const { comment_id } = req.params;
   const { inc_votes } = req.body;
 
-  if (inc_votes === undefined) {
-    res.status(400).send({ msg: "inc_votes not in body" });
-  } else {
-    return updateComments(comment_id, inc_votes)
-      .then(updatedComment => {
-        if (updatedComment.length === 0) {
-          res.status(404).send({ msg: "comment_id not found" });
-        } else {
-          const [comment] = updatedComment;
-          res.status(200).send({ comment });
-        }
-      })
-      .catch(next);
-  }
+  return updateComments(comment_id, inc_votes)
+    .then(updatedComment => {
+      if (updatedComment.length === 0) {
+        res.status(404).send({ msg: "comment_id not found" });
+      } else {
+        const [comment] = updatedComment;
+        res.status(200).send({ comment });
+      }
+    })
+    .catch(next);
 };
 
 exports.deleteComment = (req, res, next) => {
