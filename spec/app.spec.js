@@ -399,6 +399,7 @@ describe("app", () => {
                   .get("/api/articles/9999/comments")
                   .expect(404)
                   .then(({ body }) => {
+                    console.log(body);
                     expect(body).to.be.an("object");
                     expect(body).to.have.keys(["msg"]);
                     expect(body.msg).to.equal("article_id not found");

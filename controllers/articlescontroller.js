@@ -87,6 +87,7 @@ exports.getCommentsByArticleId = (req, res, next) => {
 
   selectArticlesByArticleId(article_id)
     .then(articles => {
+      console.log(articles);
       if (articles === undefined) {
         res.status(404).send({ msg: "article_id not found" });
       }
