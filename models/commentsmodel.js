@@ -1,19 +1,17 @@
-const connection = require("../dbconnection.js");
+const connection = require("../dbconnection.js")
 
 exports.updateComments = (comment_id, inc_votes) => {
   if (inc_votes === undefined) {
     return connection("comments")
       .where("comment_id", "=", comment_id)
-      .returning("*");
+      .returning("*")
   }
   return connection("comments")
     .where("comment_id", "=", comment_id)
     .increment("votes", inc_votes)
-    .returning("*");
-};
+    .returning("*")
+}
 
-exports.delComments = comment_id => {
-  return connection("comments")
-    .where("comment_id", comment_id)
-    .del();
-};
+exports.delComments = (comment_id) => {
+  return connection("comments").where("comment_id", comment_id).del()
+}

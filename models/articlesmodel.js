@@ -1,6 +1,6 @@
-const connection = require("../dbconnection.js");
+const connection = require("../dbconnection.js")
 
-exports.selectArticlesByArticleId = article_id => {
+exports.selectArticlesByArticleId = (article_id) => {
   return connection
     .select("articles.*")
     .from("articles")
@@ -9,22 +9,22 @@ exports.selectArticlesByArticleId = article_id => {
     .leftJoin("comments", "articles.article_id", "comments.article_id")
     .groupBy("articles.article_id")
     .then(([article]) => {
-      return article;
-    });
-};
+      return article
+    })
+}
 
 exports.updateArticles = (article_id, inc_votes = 0) => {
   return connection("articles")
     .where("article_id", "=", article_id)
     .increment("votes", inc_votes)
-    .returning("*");
-};
+    .returning("*")
+}
 
 exports.insertCommentToArticle = (article_id, username, body) => {
   return connection("comments")
     .insert([{ author: username, article_id: article_id, body: body }])
-    .returning("*");
-};
+    .returning("*")
+}
 
 exports.selectCommentsByArticleId = (
   article_id,
@@ -35,12 +35,12 @@ exports.selectCommentsByArticleId = (
     .select("*")
     .from("comments")
     .where("comments.article_id", article_id)
-    .modify(query => {
+    .modify((query) => {
       if (sort_by) {
-        query.orderBy(sort_by, order);
+        query.orderBy(sort_by, order)
       }
-    });
-};
+    })
+}
 
 exports.selectArticles = (
   sort_by = "created_at",
@@ -54,52 +54,46 @@ exports.selectArticles = (
     .from("articles")
     .leftJoin("comments", "articles.article_id", "comments.article_id")
     .groupBy("articles.article_id")
-    .modify(query => {
+    .modify((query) => {
       if (sort_by) {
-        query.orderBy(sort_by, order);
+        query.orderBy(sort_by, order)
       }
       if (author) {
-        query.where("articles.author", "=", author);
+        query.where("articles.author", "=", author)
       }
       if (topic) {
-        query.where("topic", "=", topic);
+        query.where("topic", "=", topic)
       }
-    });
-};
+    })
+}
 
-exports.checkAuthorExists = author => {
+exports.checkAuthorExists = (author) => {
   if (author !== undefined) {
-    return connection
-      .select("*")
-      .from("users")
-      .where("username", "=", author);
+    return connection.select("*").from("users").where("username", "=", author)
   } else {
-    return connection.select("*").from("users");
+    return connection.select("*").from("users")
   }
-};
+}
 
-exports.checkTopicExists = topic => {
+exports.checkTopicExists = (topic) => {
   if (topic !== undefined) {
-    return connection
-      .select("*")
-      .from("topics")
-      .where("slug", "=", topic);
+    return connection.select("*").from("topics").where("slug", "=", topic)
   } else {
-    return connection.select("*").from("topics");
+    return connection.select("*").from("topics")
   }
-};
+}
 
-exports.checkValidOrder = order => {
+exports.checkValidOrder = (order) => {
   if (order !== undefined && order !== "asc" && order !== "desc") {
     return Promise.reject({
       status: 400,
-      msg: "Invalid order value"
-    });
+      msg: "Invalid order value",
+    })
   } else if (order === undefined || order === "asc" || order === "desc") {
-    return Promise.resolve(order);
+    return Promise.resolve(order)
   }
-};
+}
 
-exports.checkforArticleId = article_id => {
-  return connection("articles").where("article_id", article_id);
-};
+exports.checkforArticleId = (article_id) => {
+  return connection("articles").where("article_id", article_id)
+}
