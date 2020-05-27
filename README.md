@@ -2,11 +2,13 @@
 
 This repository contains the Node.js backend API of the Full Stack Northcoders News project.
 
-This backend API is currently deployed at [https://bt-nc-news.herokuapp.com/api](https://bt-nc-news.herokuapp.com/api)
+|               | Link                                                                           |
+| ------------- | ------------------------------------------------------------------------------ |
+| Backend API   | [https://bt-nc-news.herokuapp.com/api](https://bt-nc-news.herokuapp.com/api)   |
+| Frontend Repo | [https://github.com/tben140/fe-nc-news](https://github.com/tben140/fe-nc-news) |
+| Frontend Site | [https://bt-fe-nc-news.netlify.app](https://bt-fe-nc-news.netlify.app)         |
 
-The frontend repository can be found at [https://github.com/tben140/fe-nc-news](https://github.com/tben140/fe-nc-news)
-
-The frontend is deployed at [https://bt-fe-nc-news.netlify.app](https://bt-fe-nc-news.netlify.app)
+![Screenshot](docs/screenshots/ncnews-laptop.png)
 
 ## Getting Started
 
@@ -14,7 +16,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 Ensure Node.js and npm are installed before proceeding.
 
-First, change to the destination directory then run the following command in your terminal
+First, change to the destination directory then run the following command in your terminal:
 
 ```bash
 git clone https://github.com/tben140/be-nc-news.git
@@ -29,7 +31,7 @@ npm install
 
 If PostgreSQL is not installed on your system, install PostgresApp from [https://postgresapp.com](https://postgresapp.com).
 
-Next, run the following terminal command in the project directory the create the test and production databases
+Next, run the following terminal command in the project directory the create the test and production databases:
 
 ```bash
 npm run setup-dbs
@@ -42,7 +44,7 @@ npm run seed-test
 npm run seed
 ```
 
-To start the server, run the following command, then go to [https://localhost:9090](https://localhost:9090)
+To start the server locally, run the following command, then go to [https://localhost:9090](https://localhost:9090):
 
 ```bash
 npm start
