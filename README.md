@@ -2,11 +2,11 @@
 
 This repository contains the Node.js backend API of the Full Stack Northcoders News project.
 
-|               | Link                                                                           |
-| ------------- | ------------------------------------------------------------------------------ |
-| Backend API   | [https://bt-nc-news.herokuapp.com/api](https://bt-nc-news.herokuapp.com/api)   |
-| Frontend Repo | [https://github.com/tben140/fe-nc-news](https://github.com/tben140/fe-nc-news) |
-| Frontend Site | [https://bt-fe-nc-news.netlify.app](https://bt-fe-nc-news.netlify.app)         |
+|               | Link                                                                                                         |
+| ------------- | ------------------------------------------------------------------------------------------------------------ |
+| Backend API   | [https://bt-nc-news.herokuapp.com/api](https://bt-nc-news.herokuapp.com/api)                                 |
+| Frontend Repo | [https://github.com/tben140/Northcoders-News-Frontend](https://github.com/tben140/Northcoders-News-Frontend) |
+| Frontend Site | [https://bt-fe-nc-news.netlify.app](https://bt-fe-nc-news.netlify.app)                                       |
 
 ![Screenshot](docs/screenshots/ncnews-laptop.png)
 
@@ -19,13 +19,13 @@ Ensure Node.js and npm are installed before proceeding.
 First, change to the destination directory then run the following command in your terminal:
 
 ```bash
-git clone https://github.com/tben140/be-nc-news.git
+git clone https://github.com/tben140/Northcoders-News-Backend
 ```
 
 Next, cd into the project directory and install the project dependencies with the following commands:
 
 ```bash
-cd be-nc-news
+cd Northcoders-News-Backend
 npm install
 ```
 
