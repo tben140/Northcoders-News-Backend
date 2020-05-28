@@ -19,7 +19,7 @@ Ensure Node.js and npm are installed before proceeding.
 First, change to the destination directory then run the following command in your terminal:
 
 ```bash
-git clone https://github.com/tben140/Northcoders-News-Backend
+git clone https://github.com/tben140/Northcoders-News-Backend.git
 ```
 
 Next, cd into the project directory and install the project dependencies with the following commands:
